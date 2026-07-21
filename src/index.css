@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #F1F5F9; /* Clean cool gray/blue background */
+  --blue-main: #2563EB; /* Figma active electric blue */
+  --blue-hover: #1D4ED8;
+  --blue-light: #EFF6FF; /* Accent blue backgrounds */
+  --white: #FFFFFF;
+  --border-color: #E2E8F0; /* Soft 1px border */
+  --shadow-figma: 0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  --shadow-figma-md: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+}
+
+body {
+  background-color: var(--bg);
+  color: #0F172A; /* Slate-900 high contrast */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Figma Panel Card style */
+.neuro-flat {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-figma);
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neuro-flat-hover:hover {
+  border-color: #3B82F6;
+  background-color: #F8FAFC;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.04), 0 4px 6px -4px rgba(37, 99, 235, 0.04);
+  transform: translateY(-1.5px);
+}
+
+/* Inset panel for container grids/crossword backgrounds */
+.neuro-inset {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+}
+
+/* Toolbar button styling */
+.neuro-button {
+  background-color: var(--white);
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  color: #334155;
+  font-weight: 500;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neuro-button:hover {
+  border-color: #CBD5E1;
+  background-color: #F8FAFC;
+  color: var(--blue-main);
+  transform: translateY(-0.5px);
+}
+
+.neuro-button:active {
+  background-color: #F1F5F9;
+  transform: translateY(0.5px);
+  box-shadow: inset 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+}
+
+/* Minimalist Figma-styled glass pills & badges */
+.glass {
+  background-color: var(--white);
+  border: 1px solid #E2E8F0;
+  border-radius: 9999px;
+  box-shadow: var(--shadow-figma);
+}
+
+.glass-pill {
+  background-color: var(--blue-light);
+  border: 1px solid #DBEAFE;
+  color: #1E40AF;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+/* Custom layout helper animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 99, 235, 0.3);
+}

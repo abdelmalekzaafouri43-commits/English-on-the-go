@@ -1,0 +1,6 @@
+{
+  "name": "English on the go",
+  "description": "An interactive, elegant English quiz application featuring grammar categories, games, crossword puzzles, progress tracking, and an AI tutor chat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
