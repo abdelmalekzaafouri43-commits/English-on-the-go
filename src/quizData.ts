@@ -1,1174 +1,985 @@
 export interface Question {
-  question: string;
+  id: string;
+  q: string; // sentence with "___" for blank
   options: string[];
-  answerIndex: number;
+  answer: string; // correct answer string
   explanation: string;
 }
 
-export interface Quiz {
-  title: string;
-  questions: Question[];
+export interface TenseTopic {
+  id: string;
+  name: string;
+  category: 'Present' | 'Past' | 'Future';
+  summary: string;
+  formula: string;
+  example: string;
+  quizzes: {
+    easy: Question[];
+    medium: Question[];
+    hard: Question[];
+  };
 }
 
-export interface CrosswordClue {
-  number: number;
-  direction: 'across' | 'down';
-  clue: string;
-  answer: string;
-  row: number; // 0-indexed
-  col: number; // 0-indexed
-}
-
-export interface Crossword {
-  title: string;
-  size: number; // e.g., 8 for 8x8
-  clues: CrosswordClue[];
-}
-
-export const QUIZ_SECTIONS = [
-  { id: 'present', title: 'Simple Present', icon: '⏰', count: '6 Quizzes' },
-  { id: 'past', title: 'Simple Past', icon: '📜', count: '6 Quizzes' },
-  { id: 'future', title: 'Future', icon: '🚀', count: '6 Quizzes' },
-  { id: 'antonyms', title: 'Antonyms', icon: '↔️', count: '6 Quizzes' },
-  { id: 'synonyms', title: 'Synonyms', icon: '🤝', count: '6 Quizzes' },
-  { id: 'games', title: 'Games', icon: '🧩', count: '6 Crosswords' },
-];
-
-export const DEFAULT_QUIZZES: Record<string, Quiz[]> = {
-  present: [
-    {
-      title: "Daily Routines",
-      questions: [
+export const QUIZ_TOPICS: TenseTopic[] = [
+  {
+    id: 'present_simple',
+    name: 'Present Simple',
+    category: 'Present',
+    summary: 'Used for habits, general facts, immutable truths, and regular routines.',
+    formula: 'Subject + Verb (s/es for 3rd person singular)',
+    example: 'She works as a software designer in London.',
+    quizzes: {
+      easy: [
         {
-          question: "Sarah always _______ her teeth before going to bed.",
-          options: ["brush", "brushes", "brushing", "brushed"],
-          answerIndex: 1,
-          explanation: "For third-person singular (Sarah), we add '-es' to verbs ending in 'sh'."
+          id: 'ps_e1',
+          q: 'He ___ to the library every Wednesday afternoon.',
+          options: ['go', 'goes', 'going', 'gone'],
+          answer: 'goes',
+          explanation: 'For singular third-person subjects (He/She/It) in the present simple, we append -s or -es to the base verb.'
         },
         {
-          question: "They _______ to the gym on weekends.",
-          options: ["goes", "go", "going", "gone"],
-          answerIndex: 1,
-          explanation: "For plural pronouns (They), we use the base form of the verb 'go'."
+          id: 'ps_e2',
+          q: 'Water ___ at 100 degrees Celsius.',
+          options: ['boil', 'boils', 'boiling', 'is boiling'],
+          answer: 'boils',
+          explanation: 'Scientific facts and general truths are always stated in the Present Simple tense.'
         },
         {
-          question: "My father _______ at 6:00 AM every morning.",
-          options: ["wake up", "wakes up", "waking up", "waked up"],
-          answerIndex: 1,
-          explanation: "My father is singular (he), so we use 'wakes up'."
+          id: 'ps_e3',
+          q: 'They ___ usually eat dessert after dinner.',
+          options: ["don't", "doesn't", "aren't", "not"],
+          answer: "don't",
+          explanation: 'We use "do not" (don\'t) for plural subjects (They/We/I/You) to formulate negative statements.'
         },
         {
-          question: "The school bus _______ at our street at 7:30 AM.",
-          options: ["arrive", "arriving", "arrives", "arrived"],
-          answerIndex: 2,
-          explanation: "The school bus is third-person singular, so the verb is 'arrives'."
-        },
-        {
-          question: "Do you _______ breakfast every day?",
-          options: ["eats", "eat", "eating", "ate"],
-          answerIndex: 1,
-          explanation: "In questions with 'Do', the main verb remains in its base form."
+          id: 'ps_e4',
+          q: 'The sun ___ in the east.',
+          options: ['rise', 'rises', 'rising', 'rose'],
+          answer: 'rises',
+          explanation: 'General natural truths or permanent facts require the Present Simple form "rises".'
         }
-      ]
-    },
-    {
-      title: "Subject-Verb Agreement",
-      questions: [
+      ],
+      medium: [
         {
-          question: "Neither of the students _______ a laptop today.",
-          options: ["have", "has", "having", "haves"],
-          answerIndex: 1,
-          explanation: "'Neither of the students' is grammatically singular, so it takes 'has'."
+          id: 'ps_m1',
+          q: 'How often ___ your brother wash his car?',
+          options: ['do', 'does', 'is', 'has'],
+          answer: 'does',
+          explanation: 'Questions with third-person singular subjects use the auxiliary verb "does".'
         },
         {
-          question: "English on the go _______ our favorite application.",
-          options: ["are", "is", "am", "be"],
-          answerIndex: 1,
-          explanation: "'English on the go' is a singular application name, so we use 'is'."
+          id: 'ps_m2',
+          q: 'The flight to Paris ___ at exactly 9:00 AM tomorrow.',
+          options: ['leave', 'leaves', 'leaving', 'will be left'],
+          answer: 'leaves',
+          explanation: 'Scheduled future events (timetables, programs) are described using the Present Simple.'
         },
         {
-          question: "The cat and the dog _______ always playing together.",
-          options: ["is", "are", "be", "am"],
-          answerIndex: 1,
-          explanation: "A plural subject connected by 'and' takes the plural verb 'are'."
+          id: 'ps_m3',
+          q: 'My father ___ any sugar in his coffee.',
+          options: ['do not want', 'does not want', 'is not wanting', 'not wants'],
+          answer: 'does not want',
+          explanation: 'Stative verbs like "want" are not used in continuous forms; third-person negative uses "does not want".'
         },
         {
-          question: "Every boy and girl _______ given a textbook.",
-          options: ["is", "are", "be", "were"],
-          answerIndex: 0,
-          explanation: "Subjects preceded by 'every' are grammatically singular and take 'is'."
-        },
-        {
-          question: "The jury _______ deciding the verdict now.",
-          options: ["is", "are", "be", "were"],
-          answerIndex: 0,
-          explanation: "Collective nouns (jury) acting as a single unit take a singular verb."
+          id: 'ps_m4',
+          q: 'Plants ___ sunlight to perform photosynthesis.',
+          options: ['need', 'needs', 'needing', 'are needing'],
+          answer: 'need',
+          explanation: 'Plural subject "Plants" takes the base form "need" for regular general statements.'
         }
-      ]
-    },
-    {
-      title: "Negative Sentences",
-      questions: [
+      ],
+      hard: [
         {
-          question: "He _______ like coffee, he prefers tea.",
-          options: ["don't", "not", "doesn't", "isn't"],
-          answerIndex: 2,
-          explanation: "We use 'doesn't' (does not) for third-person singular negative statements."
+          id: 'ps_h1',
+          q: 'Seldom ___ she complain about the heavy workload.',
+          options: ['does', 'do', 'is', 'has'],
+          answer: 'does',
+          explanation: 'When negative adverbs (Seldom, Rarely, Never) start a sentence, subject-auxiliary inversion is required.'
         },
         {
-          question: "We _______ need any extra help right now.",
-          options: ["doesn't", "don't", "not", "no"],
-          answerIndex: 1,
-          explanation: "We use 'don't' (do not) for first-person plural."
+          id: 'ps_h2',
+          q: 'Under no circumstances ___ the employee leave the premises without signing.',
+          options: ['does', 'do', 'has', 'is'],
+          answer: 'does',
+          explanation: 'Negative inversion: "Under no circumstances does..." follows auxiliary inversion rules.'
         },
         {
-          question: "She _______ speak Spanish fluently.",
-          options: ["doesn't", "don't", "isn't", "no"],
-          answerIndex: 0,
-          explanation: "'She' is third-person singular, requiring 'doesn't'."
-        },
-        {
-          question: "They _______ have a car, so they take the subway.",
-          options: ["doesn't", "don't", "aren't", "not"],
-          answerIndex: 1,
-          explanation: "'They' takes the plural auxiliary negative 'don't'."
-        },
-        {
-          question: "My brother _______ play video games on weekdays.",
-          options: ["don't", "doesn't", "not", "isn't"],
-          answerIndex: 1,
-          explanation: "'My brother' is singular (he), so we use 'doesn't'."
-        }
-      ]
-    },
-    {
-      title: "Question Form",
-      questions: [
-        {
-          question: "_______ she play the piano?",
-          options: ["Do", "Does", "Is", "Are"],
-          answerIndex: 1,
-          explanation: "We use 'Does' for singular third-person questions."
-        },
-        {
-          question: "_______ you live in Tunis?",
-          options: ["Do", "Does", "Is", "Are"],
-          answerIndex: 0,
-          explanation: "We use 'Do' for second-person singular/plural questions."
-        },
-        {
-          question: "What time _______ the train leave?",
-          options: ["do", "does", "is", "has"],
-          answerIndex: 1,
-          explanation: "'The train' is singular (it), so we ask 'does the train leave'."
-        },
-        {
-          question: "Where _______ your grandparents live?",
-          options: ["do", "does", "are", "is"],
-          answerIndex: 0,
-          explanation: "'Grandparents' is plural, requiring the auxiliary 'do'."
-        },
-        {
-          question: "_______ your sister work at the lab?",
-          options: ["Do", "Does", "Is", "Has"],
-          answerIndex: 1,
-          explanation: "'Your sister' is singular, so 'Does' is correct."
-        }
-      ]
-    },
-    {
-      title: "Frequency Adverbs",
-      questions: [
-        {
-          question: "He _______ arrives late; he is always on time.",
-          options: ["never", "always", "usually", "frequently"],
-          answerIndex: 0,
-          explanation: "If he is always on time, he 'never' arrives late."
-        },
-        {
-          question: "We _______ watch movies on Fridays, but sometimes we stay in.",
-          options: ["rarely", "never", "usually", "seldom"],
-          answerIndex: 2,
-          explanation: "'Usually' implies a standard routine that matches the sentence context."
-        },
-        {
-          question: "She is _______ cheerful in the morning; she loves early hours.",
-          options: ["seldom", "always", "never", "rarely"],
-          answerIndex: 1,
-          explanation: "Since she loves early hours, she is 'always' cheerful."
-        },
-        {
-          question: "My parents _______ travel because they dislike airplanes.",
-          options: ["often", "rarely", "always", "usually"],
-          answerIndex: 1,
-          explanation: "If they dislike airplanes, they 'rarely' travel."
-        },
-        {
-          question: "I _______ drink milk, I have it every single day.",
-          options: ["never", "sometimes", "always", "rarely"],
-          answerIndex: 2,
-          explanation: "Drinking it 'every single day' corresponds to 'always'."
-        }
-      ]
-    },
-    {
-      title: "General Truths",
-      questions: [
-        {
-          question: "Water _______ at 100 degrees Celsius.",
-          options: ["boil", "boils", "boiling", "boiled"],
-          answerIndex: 1,
-          explanation: "Scientific facts and general truths are written in the simple present tense singular (boils)."
-        },
-        {
-          question: "The Earth _______ around the Sun.",
-          options: ["revolve", "revolves", "revolving", "revolved"],
-          answerIndex: 1,
-          explanation: "The Earth is singular, and it's a general truth, so 'revolves'."
-        },
-        {
-          question: "Wood _______ on water.",
-          options: ["float", "floats", "floating", "floated"],
-          answerIndex: 1,
-          explanation: "A general physical truth requires the singular form 'floats'."
-        },
-        {
-          question: "The sun _______ in the East.",
-          options: ["rise", "rises", "rising", "rose"],
-          answerIndex: 1,
-          explanation: "A natural scientific truth requires the simple present 'rises'."
-        },
-        {
-          question: "Plants _______ carbon dioxide to make food.",
-          options: ["need", "needs", "needing", "needed"],
-          answerIndex: 0,
-          explanation: "'Plants' is plural, so we use the base verb 'need'."
+          id: 'ps_h3',
+          q: 'Here ___ the primary architect of the entire infrastructure.',
+          options: ['come', 'comes', 'coming', 'came'],
+          answer: 'comes',
+          explanation: 'Inverted sentence structure starting with "Here/There" takes a simple singular verb "comes" matching "the primary architect".'
         }
       ]
     }
-  ],
-  past: [
-    {
-      title: "Regular Verbs",
-      questions: [
+  },
+  {
+    id: 'present_continuous',
+    name: 'Present Continuous',
+    category: 'Present',
+    summary: 'Used for actions happening right now, temporary situations, or definite future plans.',
+    formula: 'Subject + am/is/are + Verb-ing',
+    example: 'I am practicing my English speech right now.',
+    quizzes: {
+      easy: [
         {
-          question: "Yesterday, we _______ soccer in the park.",
-          options: ["play", "played", "playing", "plays"],
-          answerIndex: 1,
-          explanation: "For regular past tense, we add '-ed' to the verb (played)."
+          id: 'pc_e1',
+          q: 'Please be quiet! The baby ___ in the nursery.',
+          options: ['sleeps', 'is sleeping', 'sleeping', 'slept'],
+          answer: 'is sleeping',
+          explanation: 'Actions happening at the exact moment of speaking require the Present Continuous ("is sleeping").'
         },
         {
-          question: "She _______ her homework an hour ago.",
-          options: ["finish", "finishing", "finished", "finishes"],
-          answerIndex: 2,
-          explanation: "'Finished' is the simple past form of the regular verb 'finish'."
+          id: 'pc_e2',
+          q: 'We ___ studying grammar together this morning.',
+          options: ['am', 'is', 'are', 'be'],
+          answer: 'are',
+          explanation: 'Plural subject "We" takes the auxiliary verb "are" followed by the -ing present participle.'
         },
         {
-          question: "They _______ Tunisia last summer.",
-          options: ["visit", "visited", "visiting", "visits"],
-          answerIndex: 1,
-          explanation: "Past event 'last summer' uses the regular past form 'visited'."
+          id: 'pc_e3',
+          q: '___ you listening to what the tutor is saying?',
+          options: ['Are', 'Is', 'Do', 'Have'],
+          answer: 'Are',
+          explanation: 'Present continuous questions with subject "you" start with the auxiliary "Are".'
         },
         {
-          question: "He _______ the door for the elderly lady.",
-          options: ["open", "opened", "opening", "opens"],
-          answerIndex: 1,
-          explanation: "The action is completed in the past, so we use 'opened'."
-        },
-        {
-          question: "We _______ a beautiful song in music class yesterday.",
-          options: ["listen", "listened", "listening", "listens"],
-          answerIndex: 1,
-          explanation: "Past time indicator 'yesterday' requires 'listened'."
+          id: 'pc_e4',
+          q: 'I ___ reading a fascinating essay at the moment.',
+          options: ['am', 'is', 'are', 'be'],
+          answer: 'am',
+          explanation: '"I" is always followed by "am" in present continuous structures.'
         }
-      ]
-    },
-    {
-      title: "Irregular Verbs",
-      questions: [
+      ],
+      medium: [
         {
-          question: "He _______ to Paris last weekend.",
-          options: ["go", "goed", "went", "gone"],
-          answerIndex: 2,
-          explanation: "The simple past of the irregular verb 'go' is 'went'."
+          id: 'pc_m1',
+          q: 'My sister ___ in London for a couple of months before moving to Berlin.',
+          options: ['lives', 'is living', 'lived', 'has lived'],
+          answer: 'is living',
+          explanation: 'Temporary situations or non-permanent living conditions are emphasized with the Present Continuous.'
         },
         {
-          question: "I _______ a delicious cake yesterday.",
-          options: ["eat", "ated", "eating", "ate"],
-          answerIndex: 3,
-          explanation: "The simple past of 'eat' is 'ate'."
+          id: 'pc_m2',
+          q: 'The tech company ___ a massive hiring phase this fiscal quarter.',
+          options: ['undergoes', 'is undergoing', 'has undergone', 'undergo'],
+          answer: 'is undergoing',
+          explanation: 'Ongoing trends or developments current to this period are stated in Present Continuous.'
         },
         {
-          question: "She _______ a beautiful letter to her cousin.",
-          options: ["write", "wrote", "written", "writed"],
-          answerIndex: 1,
-          explanation: "The irregular past tense of 'write' is 'wrote'."
+          id: 'pc_m3',
+          q: 'Why ___ you always losing your house keys?',
+          options: ['do', 'are', 'have', 'did'],
+          answer: 'are',
+          explanation: 'When expressing irritation or habits using "always", we use Present Continuous ("are you always losing").'
         },
         {
-          question: "They _______ the match with a dramatic late goal.",
-          options: ["win", "winned", "won", "winning"],
-          answerIndex: 2,
-          explanation: "The past of 'win' is 'won'."
-        },
-        {
-          question: "My father _______ me a valuable present for graduation.",
-          options: ["give", "gived", "gave", "given"],
-          answerIndex: 2,
-          explanation: "The irregular simple past of 'give' is 'gave'."
+          id: 'pc_m4',
+          q: 'We ___ dinner with the executive team tomorrow night.',
+          options: ['have', 'are having', 'had', 'do have'],
+          answer: 'are having',
+          explanation: 'Definite personal plans or pre-arranged schedules in the near future utilize Present Continuous.'
         }
-      ]
-    },
-    {
-      title: "Negatives & Questions",
-      questions: [
+      ],
+      hard: [
         {
-          question: "I _______ see him at the party last night.",
-          options: ["didn't", "don't", "wasn't", "no"],
-          answerIndex: 0,
-          explanation: "We use 'didn't' (did not) with the base verb to make negatives in the past."
+          id: 'pc_h1',
+          q: 'As we speak, global temperature averages ___ at an alarming rate.',
+          options: ['rise', 'rises', 'are rising', 'have risen'],
+          answer: 'are rising',
+          explanation: 'Gradually changing or evolving situations are exclusively represented in Present Continuous ("are rising").'
         },
         {
-          question: "_______ you complete your assignment yesterday?",
-          options: ["Do", "Did", "Was", "Were"],
-          answerIndex: 1,
-          explanation: "We use 'Did' to form questions in the simple past."
+          id: 'pc_h2',
+          q: 'Although she loves sushi, today she ___ eating simple noodles.',
+          options: ['prefers', 'prefer', 'is preferring', 'is preferring to'],
+          answer: 'is preferring',
+          explanation: 'Generally, stative verbs like "prefer" are in simple tenses, but temporary active preference at this moment can use "is preferring".'
         },
         {
-          question: "They _______ go to the beach because of the rain.",
-          options: ["didn't", "not", "don't", "wasn't"],
-          answerIndex: 0,
-          explanation: "Negative past statements require the auxiliary 'didn't'."
-        },
-        {
-          question: "What _______ she say during the meeting?",
-          options: ["do", "does", "did", "was"],
-          answerIndex: 2,
-          explanation: "We use 'did' as the helper verb for simple past questions."
-        },
-        {
-          question: "He _______ buy the book because it was too expensive.",
-          options: ["didn't", "don't", "wasn't", "no"],
-          answerIndex: 0,
-          explanation: "'didn't' is the past negative auxiliary."
-        }
-      ]
-    },
-    {
-      title: "Used to",
-      questions: [
-        {
-          question: "I _______ play video games, but now I prefer reading.",
-          options: ["use to", "used to", "used", "was used"],
-          answerIndex: 1,
-          explanation: "We use 'used to' to express past habits that no longer happen."
-        },
-        {
-          question: "Did you _______ live in London when you were young?",
-          options: ["used to", "use to", "using to", "uses to"],
-          answerIndex: 1,
-          explanation: "In questions with 'Did', 'used to' becomes 'use to' because of the auxiliary verb."
-        },
-        {
-          question: "She _______ like broccoli, but now she loves it.",
-          options: ["didn't use to", "didn't used to", "not used to", "used not to"],
-          answerIndex: 0,
-          explanation: "The correct negative form is 'didn't use to' (no 'd' on 'use')."
-        },
-        {
-          question: "We _______ go camping every single summer.",
-          options: ["used to", "use to", "was used to", "were used to"],
-          answerIndex: 0,
-          explanation: "Affirmative past habit is written as 'used to'."
-        },
-        {
-          question: "They _______ be close friends, but they grew apart.",
-          options: ["used to", "use to", "didn't use to", "were used to"],
-          answerIndex: 0,
-          explanation: "Past state 'used to be close friends'."
-        }
-      ]
-    },
-    {
-      title: "Past Continuous vs Simple Past",
-      questions: [
-        {
-          question: "I _______ when the telephone rang.",
-          options: ["cooked", "was cooking", "were cooking", "cooking"],
-          answerIndex: 1,
-          explanation: "We use the past continuous (was cooking) for an ongoing action interrupted by a sudden past action (rang)."
-        },
-        {
-          question: "While she _______, her brother was playing video games.",
-          options: ["studies", "studied", "was studying", "were studying"],
-          answerIndex: 2,
-          explanation: "We use past continuous (was studying) to show a parallel past action."
-        },
-        {
-          question: "They _______ TV when the lights went out.",
-          options: ["watched", "were watching", "was watching", "watching"],
-          answerIndex: 1,
-          explanation: "Plural past continuous: 'They were watching'."
-        },
-        {
-          question: "He _______ down the street when he met his old friend.",
-          options: ["walked", "was walking", "were walking", "is walking"],
-          answerIndex: 1,
-          explanation: "The ongoing past action 'was walking' was interrupted by 'met'."
-        },
-        {
-          question: "When I arrived at the office, they _______ a meeting.",
-          options: ["had", "was having", "were having", "have"],
-          answerIndex: 2,
-          explanation: "They were in the middle of a meeting ('were having') when I arrived."
-        }
-      ]
-    },
-    {
-      title: "Time Expressions",
-      questions: [
-        {
-          question: "They started this project three days _______.",
-          options: ["ago", "before", "last", "yesterday"],
-          answerIndex: 0,
-          explanation: "We use 'ago' after a duration of time (three days ago) to refer to the past."
-        },
-        {
-          question: "We had a big test _______ Friday.",
-          options: ["ago", "last", "yesterday", "in"],
-          answerIndex: 1,
-          explanation: "We use 'last' before days of the week (last Friday)."
-        },
-        {
-          question: "I spoke with my English tutor _______ morning.",
-          options: ["this", "last", "ago", "yesterday"],
-          answerIndex: 0,
-          explanation: "'This morning' can refer to a completed past action earlier in the same day."
-        },
-        {
-          question: "She graduated from university _______ 2024.",
-          options: ["on", "at", "in", "ago"],
-          answerIndex: 2,
-          explanation: "We use the preposition 'in' with years (in 2024)."
-        },
-        {
-          question: "He visited Tunisia _______ month.",
-          options: ["last", "yesterday", "ago", "in"],
-          answerIndex: 0,
-          explanation: "'Last month' is correct for a past completed action."
+          id: 'pc_h3',
+          q: 'The chief operations director ___ currently overseeing the factory expansion.',
+          options: ['is', 'are', 'does', 'has'],
+          answer: 'is',
+          explanation: '"The chief operations director" is singular, so it uses "is" in this passive/active context.'
         }
       ]
     }
-  ],
-  future: [
-    {
-      title: "Will vs Going to",
-      questions: [
+  },
+  {
+    id: 'present_perfect',
+    name: 'Present Perfect',
+    category: 'Present',
+    summary: 'Connects past experiences, finished actions with present results, or states starting in the past continuing now.',
+    formula: 'Subject + have/has + Past Participle (V3)',
+    example: 'I have visited Rome three times.',
+    quizzes: {
+      easy: [
         {
-          question: "Look at those dark clouds! It _______ rain.",
-          options: ["will", "is going to", "rains", "is raining"],
-          answerIndex: 1,
-          explanation: "We use 'is going to' for predictions based on present, clear physical evidence."
+          id: 'pp_e1',
+          q: 'I ___ already finished reading this novel.',
+          options: ['have', 'has', 'had', 'am'],
+          answer: 'have',
+          explanation: 'First-person singular (I) takes the auxiliary verb "have" in the Present Perfect.'
         },
         {
-          question: "Wait, I _______ help you with those heavy bags.",
-          options: ["will", "am going to", "going to", "shall to"],
-          answerIndex: 0,
-          explanation: "We use 'will' for spontaneous decisions, offers, or promises made at the moment of speaking."
+          id: 'pp_e2',
+          q: 'She has ___ in Tokyo for over six years.',
+          options: ['live', 'lives', 'lived', 'living'],
+          answer: 'lived',
+          explanation: 'Present Perfect requires the past participle (V3) form of the main verb ("lived").'
         },
         {
-          question: "I _______ study medicine at university next year; I've already enrolled.",
-          options: ["will", "am going to", "shall", "studying"],
-          answerIndex: 1,
-          explanation: "Since the decision was made before and actions are taken (enrolled), we use 'am going to'."
+          id: 'pp_e3',
+          q: 'They have not ___ their decision yet.',
+          options: ['make', 'made', 'making', 'makes'],
+          answer: 'made',
+          explanation: 'Irregular past participle of "make" is "made" in Present Perfect negative.'
         },
         {
-          question: "Maybe we _______ visit Spain next summer.",
-          options: ["will", "are going to", "shall to", "go to"],
-          answerIndex: 0,
-          explanation: "We use 'will' with 'maybe' or when expressing a non-definite possibility."
-        },
-        {
-          question: "I promise I _______ call you as soon as I arrive.",
-          options: ["will", "am going to", "calls", "going to"],
-          answerIndex: 0,
-          explanation: "We use 'will' for making promises."
+          id: 'pp_e4',
+          q: 'We have ___ each other since childhood.',
+          options: ['know', 'knew', 'known', 'knowing'],
+          answer: 'known',
+          explanation: 'The past participle of the stative verb "know" is "known".'
         }
-      ]
-    },
-    {
-      title: "Future Plans",
-      questions: [
+      ],
+      medium: [
         {
-          question: "We _______ the museum tomorrow morning. The tickets are bought.",
-          options: ["visit", "are visiting", "will visit", "visited"],
-          answerIndex: 1,
-          explanation: "The present continuous (are visiting) is often used for confirmed personal future arrangements."
+          id: 'pp_m1',
+          q: 'We haven\'t received any updates from the design team ___ last Tuesday.',
+          options: ['for', 'since', 'during', 'ago'],
+          answer: 'since',
+          explanation: '"Since" is used to define a specific starting point in time, whereas "for" defines a duration.'
         },
         {
-          question: "She _______ her driving test next week.",
-          options: ["takes", "is taking", "took", "will take"],
-          answerIndex: 1,
-          explanation: "Planned appointment or schedule next week uses the arrangement form 'is taking' or 'is going to take'."
+          id: 'pp_m2',
+          q: '___ you ever eaten fresh sushi in Tokyo?',
+          options: ['Have', 'Has', 'Did', 'Were'],
+          answer: 'Have',
+          explanation: 'To query life experiences up to now, use "Have you + V3".'
         },
         {
-          question: "They _______ married in October.",
-          options: ["get", "are getting", "will get", "got"],
-          answerIndex: 1,
-          explanation: "Personal arrangements like getting married are commonly expressed with present continuous 'are getting'."
+          id: 'pp_m3',
+          q: 'She ___ her keys, so she cannot open the office door.',
+          options: ['lost', 'has lost', 'had lost', 'loses'],
+          answer: 'has lost',
+          explanation: 'Use Present Perfect when a past action has a direct, immediate consequence in the present.'
         },
         {
-          question: "What time _______ you meeting him tonight?",
-          options: ["will", "are", "do", "going to"],
-          answerIndex: 1,
-          explanation: "'Are you meeting' is the correct present continuous question form for future arrangements."
-        },
-        {
-          question: "I _______ to Tunis on Friday evening.",
-          options: ["fly", "am flying", "flew", "flies"],
-          answerIndex: 1,
-          explanation: "A concrete planned arrangement uses 'am flying'."
+          id: 'pp_m4',
+          q: 'I have worked in this technology sector ___ twelve years.',
+          options: ['since', 'for', 'ago', 'during'],
+          answer: 'for',
+          explanation: '"For" denotes the total duration of the period of time (twelve years).'
         }
-      ]
-    },
-    {
-      title: "Promises & Offers",
-      questions: [
+      ],
+      hard: [
         {
-          question: "Don't worry, I _______ tell anyone your secret.",
-          options: ["will", "won't", "am not going to", "don't"],
-          answerIndex: 1,
-          explanation: "We use 'won't' (will not) for negative promises."
+          id: 'pp_h1',
+          q: 'This is the most complex grammar challenge I ___ encountered.',
+          options: ['have ever', 'ever had', 'did ever', 'was ever'],
+          answer: 'have ever',
+          explanation: 'Superlative constructions ("the most complex...") are followed by the Present Perfect with "ever".'
         },
         {
-          question: "The phone is ringing. I _______ answer it!",
-          options: ["will", "am going to", "answering", "shall to"],
-          answerIndex: 0,
-          explanation: "A spontaneous offer/decision at the moment of speaking requires 'will'."
+          id: 'pp_h2',
+          q: 'It is the first time that we ___ this analytical solution.',
+          options: ['see', 'saw', 'have seen', 'had seen'],
+          answer: 'have seen',
+          explanation: 'Sentences beginning with "It is the first/second time..." use the Present Perfect.'
         },
         {
-          question: "_______ I carry that suitcase for you?",
-          options: ["Will", "Shall", "Do", "Would"],
-          answerIndex: 1,
-          explanation: "We use 'Shall' in questions with 'I' or 'We' to make polite offers or suggestions."
-        },
-        {
-          question: "We _______ always support you, no matter what.",
-          options: ["will", "are going to", "going to", "shall to"],
-          answerIndex: 0,
-          explanation: "A profound promise or determination uses 'will'."
-        },
-        {
-          question: "I _______ pay you back the money tomorrow.",
-          options: ["will", "am going to", "won't", "pay"],
-          answerIndex: 0,
-          explanation: "A promise of repayment uses 'will'."
-        }
-      ]
-    },
-    {
-      title: "Future Continuous",
-      questions: [
-        {
-          question: "This time tomorrow, I _______ on a beach in Tunisia.",
-          options: ["will lie", "will be lying", "am lying", "lie"],
-          answerIndex: 1,
-          explanation: "We use the future continuous (will be lying) to talk about an action in progress at a specific future time."
-        },
-        {
-          question: "Don't call her at 8 PM. She _______ dinner with her family.",
-          options: ["will have", "will be having", "has", "having"],
-          answerIndex: 1,
-          explanation: "An ongoing future action at that specific hour is expressed with 'will be having'."
-        },
-        {
-          question: "At midnight, they _______ sleeping soundly.",
-          options: ["will be", "will", "are", "shall"],
-          answerIndex: 0,
-          explanation: "Full verb phrase is 'will be sleeping'."
-        },
-        {
-          question: "_______ you be using your car tomorrow morning?",
-          options: ["Will", "Are", "Do", "Shall"],
-          answerIndex: 0,
-          explanation: "'Will you be using' is future continuous question form, used to ask politely about plans."
-        },
-        {
-          question: "In ten years, many people _______ driving electric vehicles.",
-          options: ["will be", "are", "will", "going to"],
-          answerIndex: 0,
-          explanation: "Future continuous 'will be driving' represents an ongoing state in the future."
-        }
-      ]
-    },
-    {
-      title: "Future Perfect",
-      questions: [
-        {
-          question: "By next month, she _______ her research project.",
-          options: ["will finish", "will have finished", "finishes", "will be finishing"],
-          answerIndex: 1,
-          explanation: "We use the future perfect (will have finished) for actions that will be completed before a certain point in the future."
-        },
-        {
-          question: "I _______ my degree by the end of this year.",
-          options: ["will complete", "will have completed", "completed", "am completing"],
-          answerIndex: 1,
-          explanation: "Action completed 'by' a future point uses 'will have completed'."
-        },
-        {
-          question: "They _______ in Tunisia for ten years by next August.",
-          options: ["will live", "will have lived", "have lived", "will be living"],
-          answerIndex: 1,
-          explanation: "Duration of a state leading up to a future point uses 'will have lived'."
-        },
-        {
-          question: "By the time you arrive, we _______ cooking dinner.",
-          options: ["will finish", "will have finished", "finished", "finish"],
-          answerIndex: 1,
-          explanation: "Completed future event before another future event (your arrival) uses 'will have finished'."
-        },
-        {
-          question: "Will you _______ written the article by tomorrow morning?",
-          options: ["has", "have", "had", "be"],
-          answerIndex: 1,
-          explanation: "Future perfect auxiliary is always 'will have' (never has/had) followed by past participle."
-        }
-      ]
-    },
-    {
-      title: "Expressing Future with Present",
-      questions: [
-        {
-          question: "The flight _______ at 9:00 PM tonight.",
-          options: ["leaves", "will have left", "left", "leaving"],
-          answerIndex: 0,
-          explanation: "We use the simple present (leaves) for scheduled public events (timetables, flights, movies)."
-        },
-        {
-          question: "As soon as he _______, we will begin the meeting.",
-          options: ["will arrive", "arrives", "arrived", "arriving"],
-          answerIndex: 1,
-          explanation: "In time clauses (after as soon as, when, before), we use simple present 'arrives' instead of will."
-        },
-        {
-          question: "If it _______ tomorrow, we won't go on a picnic.",
-          options: ["will rain", "rains", "rained", "is raining"],
-          answerIndex: 1,
-          explanation: "In first conditional 'if' clauses, we use the simple present tense to refer to the future."
-        },
-        {
-          question: "The school term _______ on September 15th.",
-          options: ["starts", "is starting", "will have started", "started"],
-          answerIndex: 0,
-          explanation: "Timetabled school calendars use simple present 'starts'."
-        },
-        {
-          question: "I will call you when I _______ to the hotel.",
-          options: ["will get", "get", "got", "am getting"],
-          answerIndex: 1,
-          explanation: "In a time clause starting with 'when', use simple present 'get'."
+          id: 'pp_h3',
+          q: 'No sooner ___ the team arrived than the presentation collapsed.',
+          options: ['has', 'have', 'had', 'did'],
+          answer: 'had',
+          explanation: '"No sooner" requires inversion with Past Perfect, so we use "had" instead of Present Perfect in retrospective narratives.'
         }
       ]
     }
-  ],
-  antonyms: [
-    {
-      title: "Basic Adjectives",
-      questions: [
+  },
+  {
+    id: 'past_simple',
+    name: 'Past Simple',
+    category: 'Past',
+    summary: 'Describes finished actions that occurred at a specific point in the past.',
+    formula: 'Subject + Past Form of Verb (V2)',
+    example: 'We traveled to Spain last summer.',
+    quizzes: {
+      easy: [
         {
-          question: "What is the antonym of 'wet'?",
-          options: ["damp", "dry", "humid", "watery"],
-          answerIndex: 1,
-          explanation: "The direct opposite of wet is dry."
+          id: 'pas_e1',
+          q: 'They ___ a new house in the suburbs last year.',
+          options: ['buy', 'bought', 'buying', 'buys'],
+          answer: 'bought',
+          explanation: 'The past simple of the irregular verb "buy" is "bought".'
         },
         {
-          question: "What is the antonym of 'sharp'?",
-          options: ["pointy", "blunt", "clever", "acute"],
-          answerIndex: 1,
-          explanation: "A knife that is not sharp is described as blunt."
+          id: 'pas_e2',
+          q: 'Did you ___ the beautiful sunset yesterday?',
+          options: ['see', 'saw', 'seen', 'seeing'],
+          answer: 'see',
+          explanation: 'In past simple questions with "did", the main verb reverts to its base form ("see").'
         },
         {
-          question: "What is the antonym of 'rough'?",
-          options: ["smooth", "coarse", "bumpy", "hard"],
-          answerIndex: 0,
-          explanation: "'Smooth' is the antonym of 'rough'."
+          id: 'pas_e3',
+          q: 'Last night, I ___ to bed at around 11 PM.',
+          options: ['go', 'goes', 'went', 'gone'],
+          answer: 'went',
+          explanation: 'The irregular past simple of "go" is "went".'
         },
         {
-          question: "What is the antonym of 'cheap'?",
-          options: ["inexpensive", "affordable", "expensive", "costly"],
-          answerIndex: 2,
-          explanation: "'Expensive' is the direct antonym of 'cheap'."
-        },
-        {
-          question: "What is the antonym of 'deep'?",
-          options: ["shallow", "hollow", "flat", "narrow"],
-          answerIndex: 0,
-          explanation: "'Shallow' is the antonym of 'deep'."
+          id: 'pas_e4',
+          q: 'She ___ French during her primary school years.',
+          options: ['study', 'studies', 'studied', 'studying'],
+          answer: 'studied',
+          explanation: 'Regular verb "study" becomes "studied" in simple past tense.'
         }
-      ]
-    },
-    {
-      title: "Emotions & Feelings",
-      questions: [
+      ],
+      medium: [
         {
-          question: "What is the antonym of 'cheerful'?",
-          options: ["gloomy", "happy", "excited", "friendly"],
-          answerIndex: 0,
-          explanation: "Gloomy means dark, sad, or depressed, which is the antonym of cheerful."
+          id: 'pas_m1',
+          q: 'While I was cooking dinner, the telephone suddenly ___.',
+          options: ['ring', 'rang', 'rung', 'was ringing'],
+          answer: 'rang',
+          explanation: 'A short, sudden past action interrupting a continuous background action is expressed in the Past Simple.'
         },
         {
-          question: "What is the antonym of 'brave'?",
-          options: ["bold", "fearless", "cowardly", "strong"],
-          answerIndex: 2,
-          explanation: "Cowardly is the opposite of brave."
+          id: 'pas_m2',
+          q: 'The local post office ___ closed ten minutes ago.',
+          options: ['is', 'was', 'were', 'been'],
+          answer: 'was',
+          explanation: '"Post office" is singular, and "ago" denotes finished past time, requiring "was".'
         },
         {
-          question: "What is the antonym of 'anxious'?",
-          options: ["nervous", "calm", "excited", "worried"],
-          answerIndex: 1,
-          explanation: "Calm is the opposite of anxious."
+          id: 'pas_m3',
+          q: 'How long ago ___ they sign the legal contract?',
+          options: ['did', 'do', 'have', 'had'],
+          answer: 'did',
+          explanation: '"How long ago" signals that a past simple question is required, which uses the auxiliary "did".'
         },
         {
-          question: "What is the antonym of 'humble'?",
-          options: ["modest", "polite", "proud", "shy"],
-          answerIndex: 2,
-          explanation: "Proud or arrogant is the antonym of humble."
-        },
-        {
-          question: "What is the antonym of 'hostile'?",
-          options: ["aggressive", "friendly", "mean", "distant"],
-          answerIndex: 1,
-          explanation: "Friendly is the antonym of hostile (which means unfriendly or opposing)."
+          id: 'pas_m4',
+          q: 'He ___ English for five years, but now he is focusing on Mandarin.',
+          options: ['learned', 'has learned', 'learns', 'is learning'],
+          answer: 'learned',
+          explanation: 'Since the action is completely finished (he now studies Mandarin), use the Past Simple "learned".'
         }
-      ]
-    },
-    {
-      title: "Verbs",
-      questions: [
+      ],
+      hard: [
         {
-          question: "What is the antonym of 'accept'?",
-          options: ["receive", "reject", "agree", "take"],
-          answerIndex: 1,
-          explanation: "To reject is to refuse to accept something."
+          id: 'pas_h1',
+          q: 'If I ___ his mobile number, I would have texted him yesterday.',
+          options: ['know', 'knew', 'had known', 'have known'],
+          answer: 'had known',
+          explanation: 'Third conditional sentences require Past Perfect ("had known") in the conditional clause.'
         },
         {
-          question: "What is the antonym of 'create'?",
-          options: ["destroy", "build", "design", "make"],
-          answerIndex: 0,
-          explanation: "Destroy is the antonym of create."
+          id: 'pas_h2',
+          q: 'It was highly crucial that she ___ on time for the hearing.',
+          options: ['arrive', 'arrived', 'arrives', 'had arrived'],
+          answer: 'arrive',
+          explanation: 'The mandating structure "It was crucial that..." uses subjunctive mood, requiring the base verb form "arrive".'
         },
         {
-          question: "What is the antonym of 'remember'?",
-          options: ["recall", "forget", "remind", "memorize"],
-          answerIndex: 1,
-          explanation: "Forget is the direct opposite of remember."
-        },
-        {
-          question: "What is the antonym of 'succeed'?",
-          options: ["fail", "win", "achieve", "advance"],
-          answerIndex: 0,
-          explanation: "'Fail' is the opposite of 'succeed'."
-        },
-        {
-          question: "What is the antonym of 'scatter'?",
-          options: ["gather", "disperse", "spread", "throw"],
-          answerIndex: 0,
-          explanation: "Gather (bring together) is the antonym of scatter (throw around)."
-        }
-      ]
-    },
-    {
-      title: "Advanced Descriptors",
-      questions: [
-        {
-          question: "What is the antonym of 'generous'?",
-          options: ["charitable", "stingy", "kind", "wealthy"],
-          answerIndex: 1,
-          explanation: "Stingy means unwilling to spend or give money, the antonym of generous."
-        },
-        {
-          question: "What is the antonym of 'cautious'?",
-          options: ["careful", "reckless", "prudent", "safe"],
-          answerIndex: 1,
-          explanation: "Reckless means acting without caution or care for consequences."
-        },
-        {
-          question: "What is the antonym of 'temporary'?",
-          options: ["brief", "permanent", "momentary", "instant"],
-          answerIndex: 1,
-          explanation: "Permanent means lasting forever, the antonym of temporary."
-        },
-        {
-          question: "What is the antonym of 'amateur'?",
-          options: ["beginner", "novice", "professional", "unskilled"],
-          answerIndex: 2,
-          explanation: "'Professional' is the antonym of 'amateur'."
-        },
-        {
-          question: "What is the antonym of 'optimistic'?",
-          options: ["hopeful", "positive", "pessimistic", "cheerful"],
-          answerIndex: 2,
-          explanation: "'Pessimistic' is the antonym of 'optimistic'."
-        }
-      ]
-    },
-    {
-      title: "Abstract Concepts",
-      questions: [
-        {
-          question: "What is the antonym of 'chaos'?",
-          options: ["order", "confusion", "disorder", "mess"],
-          answerIndex: 0,
-          explanation: "Order is the state of peace and structural clarity, the opposite of chaos."
-        },
-        {
-          question: "What is the antonym of 'freedom'?",
-          options: ["liberty", "slavery", "independence", "rights"],
-          answerIndex: 1,
-          explanation: "Slavery or captivity is the antonym of freedom."
-        },
-        {
-          question: "What is the antonym of 'abundance'?",
-          options: ["scarcity", "plenty", "wealth", "surplus"],
-          answerIndex: 0,
-          explanation: "Scarcity means a very small or insufficient supply, the antonym of abundance."
-        },
-        {
-          question: "What is the antonym of 'harmony'?",
-          options: ["discord", "peace", "agreement", "unity"],
-          answerIndex: 0,
-          explanation: "Discord (disagreement or lack of harmony) is the opposite of harmony."
-        },
-        {
-          question: "What is the antonym of 'victory'?",
-          options: ["triumph", "defeat", "success", "achievement"],
-          answerIndex: 1,
-          explanation: "Defeat is the antonym of victory."
-        }
-      ]
-    },
-    {
-      title: "Academic Vocab",
-      questions: [
-        {
-          question: "What is the antonym of 'vague'?",
-          options: ["unclear", "precise", "fuzzy", "abstract"],
-          answerIndex: 1,
-          explanation: "Precise or clear is the antonym of vague."
-        },
-        {
-          question: "What is the antonym of 'rigid'?",
-          options: ["stiff", "flexible", "firm", "hard"],
-          answerIndex: 1,
-          explanation: "Flexible is the antonym of rigid."
-        },
-        {
-          question: "What is the antonym of 'voluntary'?",
-          options: ["optional", "compulsory", "willing", "free"],
-          answerIndex: 1,
-          explanation: "Compulsory (mandatory) is the antonym of voluntary."
-        },
-        {
-          question: "What is the antonym of 'diligent'?",
-          options: ["lazy", "hardworking", "active", "studious"],
-          answerIndex: 0,
-          explanation: "Lazy is the antonym of diligent (hardworking)."
-        },
-        {
-          question: "What is the antonym of 'expand'?",
-          options: ["grow", "shrink", "stretch", "multiply"],
-          answerIndex: 1,
-          explanation: "Shrink or contract is the antonym of expand."
+          id: 'pas_h3',
+          q: 'No sooner had they started the drive than it ___ to rain heavily.',
+          options: ['begin', 'began', 'begun', 'was beginning'],
+          answer: 'began',
+          explanation: 'The correlative phrase "No sooner had... than..." links with a Past Simple statement ("began").'
         }
       ]
     }
-  ],
-  synonyms: [
-    {
-      title: "Standard Adjectives",
-      questions: [
+  },
+  {
+    id: 'past_continuous',
+    name: 'Past Continuous',
+    category: 'Past',
+    summary: 'Emphasizes actions that were in progress at a specific moment in the past.',
+    formula: 'Subject + was/were + Verb-ing',
+    example: 'I was sleeping when the alarm went off at dawn.',
+    quizzes: {
+      easy: [
         {
-          question: "What is a synonym of 'smart'?",
-          options: ["dull", "intelligent", "slow", "lazy"],
-          answerIndex: 1,
-          explanation: "Intelligent is a synonym of smart."
+          id: 'pco_e1',
+          q: 'At 8:00 PM yesterday, we ___ watching the soccer match.',
+          options: ['was', 'were', 'are', 'been'],
+          answer: 'were',
+          explanation: 'Plural subject "we" takes the past auxiliary "were" in Past Continuous.'
         },
         {
-          question: "What is a synonym of 'vast'?",
-          options: ["tiny", "narrow", "huge", "small"],
-          answerIndex: 2,
-          explanation: "Vast and huge both mean extremely large."
+          id: 'pco_e2',
+          q: 'She ___ studying in her bedroom when the power cut happened.',
+          options: ['was', 'were', 'is', 'did'],
+          answer: 'was',
+          explanation: 'Singular third-person "She" takes the auxiliary "was" in Past Continuous.'
         },
         {
-          question: "What is a synonym of 'glad'?",
-          options: ["sad", "happy", "angry", "scared"],
-          answerIndex: 1,
-          explanation: "Glad and happy both mean feeling pleasure or joy."
+          id: 'pco_e3',
+          q: 'What ___ you doing when I called you last night?',
+          options: ['was', 'were', 'did', 'are'],
+          answer: 'were',
+          explanation: 'Questions with plural/singular "you" use "were" ("What were you doing...").'
         },
         {
-          question: "What is a synonym of 'brief'?",
-          options: ["long", "extended", "short", "detailed"],
-          answerIndex: 2,
-          explanation: "Brief and short have the same meaning."
-        },
-        {
-          question: "What is a synonym of 'difficult'?",
-          options: ["easy", "hard", "simple", "painless"],
-          answerIndex: 1,
-          explanation: "Hard is a direct synonym of difficult."
+          id: 'pco_e4',
+          q: 'It ___ raining cats and dogs when we set foot outside.',
+          options: ['was', 'were', 'is', 'did'],
+          answer: 'was',
+          explanation: '"It" takes "was" to describe background weather conditions in Past Continuous.'
         }
-      ]
-    },
-    {
-      title: "Active Verbs",
-      questions: [
+      ],
+      medium: [
         {
-          question: "What is a synonym of 'sprint'?",
-          options: ["walk", "run", "crawl", "hop"],
-          answerIndex: 1,
-          explanation: "To sprint is to run very fast over a short distance."
+          id: 'pco_m1',
+          q: 'While my colleagues ___ the quarterly report, I prepared the coffee.',
+          options: ['discussed', 'were discussing', 'are discussing', 'had discussed'],
+          answer: 'were discussing',
+          explanation: 'Two actions occurring simultaneously in the past are both stated using the continuous structure.'
         },
         {
-          question: "What is a synonym of 'gaze'?",
-          options: ["stare", "blink", "close", "shut"],
-          answerIndex: 0,
-          explanation: "To gaze is to look steadily or stare at something."
+          id: 'pco_m2',
+          q: 'The noise was unbearable because our neighbors ___ their home.',
+          options: ['renovated', 'were renovating', 'are renovating', 'renovate'],
+          answer: 'were renovating',
+          explanation: 'Background ongoing reason in the past requires Past Continuous ("were renovating").'
         },
         {
-          question: "What is a synonym of 'construct'?",
-          options: ["destroy", "build", "break", "ruin"],
-          answerIndex: 1,
-          explanation: "To construct is to build or put together."
+          id: 'pco_m3',
+          q: 'I ___ to call you, but I completely forgot.',
+          options: ['mean', 'was meaning', 'have meant', 'am meaning'],
+          answer: 'was meaning',
+          explanation: 'Temporary past intention is expressed using Past Continuous "was meaning".'
         },
         {
-          question: "What is a synonym of 'ponder'?",
-          options: ["forget", "think", "ignore", "neglect"],
-          answerIndex: 1,
-          explanation: "To ponder is to think about something carefully."
-        },
-        {
-          question: "What is a synonym of 'assist'?",
-          options: ["hinder", "help", "block", "stop"],
-          answerIndex: 1,
-          explanation: "To assist is to help someone."
+          id: 'pco_m4',
+          q: 'They ___ fast asleep when the security alarm rang.',
+          options: ['was not sleeping', 'were not sleeping', 'did not sleep', 'aren\'t sleeping'],
+          answer: 'were not sleeping',
+          explanation: 'Use plural "were" to describe what they were not doing at that time.'
         }
-      ]
-    },
-    {
-      title: "Nouns",
-      questions: [
+      ],
+      hard: [
         {
-          question: "What is a synonym of 'dwelling'?",
-          options: ["car", "house", "road", "shop"],
-          answerIndex: 1,
-          explanation: "A dwelling is a house, apartment, or other place of residence."
+          id: 'pco_h1',
+          q: 'Throughout the entire meeting, the CFO ___ doodles on his notepad.',
+          options: ['drew', 'was drawing', 'had drawn', 'draws'],
+          answer: 'was drawing',
+          explanation: 'To express irritation or emphasize a continuous action over a duration, use Past Continuous.'
         },
         {
-          question: "What is a synonym of 'path'?",
-          options: ["lake", "route", "mountain", "cloud"],
-          answerIndex: 1,
-          explanation: "A path is a route or way."
+          id: 'pco_h2',
+          q: 'Hardly ___ the presentation when the main projector failed.',
+          options: ['was they giving', 'were they giving', 'had they given', 'did they give'],
+          answer: 'were they giving',
+          explanation: 'Inverted continuous structure: "Hardly were they giving..." represents action in progress when interrupted.'
         },
         {
-          question: "What is a synonym of 'infant'?",
-          options: ["adult", "baby", "teenager", "elder"],
-          answerIndex: 1,
-          explanation: "An infant is a very young child or baby."
-        },
-        {
-          question: "What is a synonym of 'scent'?",
-          options: ["smell", "color", "sound", "taste"],
-          answerIndex: 0,
-          explanation: "Scent is a distinctive smell, especially a pleasant one."
-        },
-        {
-          question: "What is a synonym of 'foe'?",
-          options: ["friend", "partner", "enemy", "ally"],
-          answerIndex: 2,
-          explanation: "A foe is an enemy."
-        }
-      ]
-    },
-    {
-      title: "Advanced Synonyms",
-      questions: [
-        {
-          question: "What is a synonym of 'diligent'?",
-          options: ["careless", "lazy", "hardworking", "indifferent"],
-          answerIndex: 2,
-          explanation: "Diligent means showing care and conscientiousness, i.e., hardworking."
-        },
-        {
-          question: "What is a synonym of 'abundant'?",
-          options: ["scarce", "limited", "plentiful", "empty"],
-          answerIndex: 2,
-          explanation: "Abundant and plentiful mean existing in large quantities."
-        },
-        {
-          question: "What is a synonym of 'genuine'?",
-          options: ["fake", "authentic", "artificial", "false"],
-          answerIndex: 1,
-          explanation: "Genuine and authentic mean real and true."
-        },
-        {
-          question: "What is a synonym of 'courageous'?",
-          options: ["fearful", "cowardly", "brave", "weak"],
-          answerIndex: 2,
-          explanation: "Courageous and brave mean showing courage."
-        },
-        {
-          question: "What is a synonym of 'vivid'?",
-          options: ["dull", "bright", "pale", "dark"],
-          answerIndex: 1,
-          explanation: "Vivid means producing powerful, bright, or clear feelings/images."
-        }
-      ]
-    },
-    {
-      title: "Literary Words",
-      questions: [
-        {
-          question: "What is a synonym of 'concise'?",
-          options: ["lengthy", "wordy", "brief", "unclear"],
-          answerIndex: 2,
-          explanation: "Concise means giving a lot of information clearly and in a few words (brief)."
-        },
-        {
-          question: "What is a synonym of 'benevolent'?",
-          options: ["cruel", "kind", "stingy", "selfish"],
-          answerIndex: 1,
-          explanation: "Benevolent means well-meaning and kindly."
-        },
-        {
-          question: "What is a synonym of 'weary'?",
-          options: ["energetic", "tired", "happy", "bored"],
-          answerIndex: 1,
-          explanation: "Weary means feeling or showing extreme tiredness."
-        },
-        {
-          question: "What is a synonym of 'hostility'?",
-          options: ["friendship", "kindness", "anger", "peace"],
-          answerIndex: 2,
-          explanation: "Hostility involves unfriendly behavior or anger."
-        },
-        {
-          question: "What is a synonym of 'solitude'?",
-          options: ["crowd", "isolation", "gathering", "noise"],
-          answerIndex: 1,
-          explanation: "Solitude is the state of being alone (isolation)."
-        }
-      ]
-    },
-    {
-      title: "Daily Expressions",
-      questions: [
-        {
-          question: "What is a synonym of 'complete'?",
-          options: ["start", "finish", "fail", "neglect"],
-          answerIndex: 1,
-          explanation: "To complete is to finish or bring to an end."
-        },
-        {
-          question: "What is a synonym of 'quick'?",
-          options: ["slow", "rapid", "steady", "gradual"],
-          answerIndex: 1,
-          explanation: "Rapid is a synonym of quick."
-        },
-        {
-          question: "What is a synonym of 'correct'?",
-          options: ["wrong", "right", "incorrect", "false"],
-          answerIndex: 1,
-          explanation: "Right is a synonym of correct."
-        },
-        {
-          question: "What is a synonym of 'gather'?",
-          options: ["scatter", "disperse", "collect", "throw"],
-          answerIndex: 2,
-          explanation: "Collect and gather both mean to bring together."
-        },
-        {
-          question: "What is a synonym of 'purchase'?",
-          options: ["sell", "give", "buy", "borrow"],
-          answerIndex: 2,
-          explanation: "To purchase is to buy."
+          id: 'pco_h3',
+          q: 'The firm ___ losing millions daily during that specific trade blockade.',
+          options: ['was', 'were', 'is', 'had'],
+          answer: 'was',
+          explanation: '"The firm" acts as a collective singular noun here, requiring "was losing".'
         }
       ]
     }
-  ]
-};
-
-export const DEFAULT_CROSSWORDS: Crossword[] = [
-  {
-    title: "Grammar & General #1",
-    size: 7,
-    clues: [
-      { number: 1, direction: 'across', clue: "Opposite of 'off'. (2 letters)", answer: "ON", row: 0, col: 1 },
-      { number: 2, direction: 'across', clue: "To consume food. (3 letters)", answer: "EAT", row: 2, col: 1 },
-      { number: 3, direction: 'across', clue: "Third-person singular for 'to be'. (2 letters)", answer: "IS", row: 4, col: 2 },
-      { number: 4, direction: 'across', clue: "We breathe this. (3 letters)", answer: "AIR", row: 6, col: 2 },
-      { number: 5, direction: 'down', clue: "Preposition of time/place: '___ 5 o'clock'. (2 letters)", answer: "AT", row: 2, col: 2 },
-      { number: 6, direction: 'down', clue: "To perform or execute an action. (2 letters)", answer: "DO", row: 0, col: 4 },
-      { number: 7, direction: 'down', clue: "Opposite of 'yes'. (2 letters)", answer: "NO", row: 0, col: 2 }
-    ]
   },
   {
-    title: "Simple Present Clues #2",
-    size: 8,
-    clues: [
-      { number: 1, direction: 'across', clue: "He _______ the soccer ball every day. (5 letters)", answer: "PLAYS", row: 1, col: 1 },
-      { number: 2, direction: 'across', clue: "Plural pronoun 'we/they' helper verb. (3 letters)", answer: "ARE", row: 3, col: 3 },
-      { number: 3, direction: 'across', clue: "I _______ to bed at 10 PM. (2 letters)", answer: "GO", row: 5, col: 4 },
-      { number: 4, direction: 'down', clue: "She _______ her homework at night. (4 letters)", answer: "DOES", row: 1, col: 5 },
-      { number: 5, direction: 'down', clue: "He is _______ honest person. (2 letters)", answer: "AN", row: 1, col: 3 },
-      { number: 6, direction: 'down', clue: "To take a seat. (3 letters)", answer: "SIT", row: 1, col: 1 }
-    ]
+    id: 'past_perfect',
+    name: 'Past Perfect',
+    category: 'Past',
+    summary: 'Clarifies sequence by describing an action completed before another past event.',
+    formula: 'Subject + had + Past Participle (V3)',
+    example: 'The express train had left before we arrived at the terminal.',
+    quizzes: {
+      easy: [
+        {
+          id: 'ppf_e1',
+          q: 'By the time she turned on the TV, the game ___ finished.',
+          options: ['has', 'had', 'was', 'is'],
+          answer: 'had',
+          explanation: 'We use the Past Perfect "had" to show one past action finished before another past action.'
+        },
+        {
+          id: 'ppf_e2',
+          q: 'They ___ already eaten breakfast when we woke up.',
+          options: ['have', 'had', 'was', 'did'],
+          answer: 'had',
+          explanation: 'Past Perfect structure: "had" + past participle "eaten".'
+        },
+        {
+          id: 'ppf_e3',
+          q: 'I realized that I ___ left my passport at home.',
+          options: ['have', 'had', 'was', 'am'],
+          answer: 'had',
+          explanation: 'Leaving the passport occurred before the past realization, requiring Past Perfect.'
+        },
+        {
+          id: 'ppf_e4',
+          q: 'We had ___ each other for years before we became partners.',
+          options: ['know', 'knew', 'known', 'knowing'],
+          answer: 'known',
+          explanation: 'Use past participle "known" after "had" in Past Perfect.'
+        }
+      ],
+      medium: [
+        {
+          id: 'ppf_m1',
+          q: 'She did not accept the job because she ___ already decided to move abroad.',
+          options: ['has', 'had', 'was', 'is'],
+          answer: 'had',
+          explanation: 'The decision was made prior to rejecting the job offer.'
+        },
+        {
+          id: 'ppf_m2',
+          q: 'Had they ___ the system requirements before installing the database?',
+          options: ['check', 'checked', 'checking', 'checks'],
+          answer: 'checked',
+          explanation: 'In interrogative Past Perfect, use auxiliary "Had" + past participle "checked".'
+        },
+        {
+          id: 'ppf_m3',
+          q: 'By 2024, the enterprise ___ expanded into five countries.',
+          options: ['has', 'had', 'was', 'is'],
+          answer: 'had',
+          explanation: 'Actions completed by a specific point in the past are written in the Past Perfect.'
+        },
+        {
+          id: 'ppf_m4',
+          q: 'The manager was angry because the report ___ not been delivered.',
+          options: ['has', 'had', 'was', 'did'],
+          answer: 'had',
+          explanation: 'Passive past perfect structure: "had not been delivered".'
+        }
+      ],
+      hard: [
+        {
+          id: 'ppf_h1',
+          q: 'Scarcely ___ the contract been signed when the lawsuit was filed.',
+          options: ['has', 'have', 'had', 'was'],
+          answer: 'had',
+          explanation: 'Negative inversion starting with "Scarcely" requires Past Perfect "had" inversion.'
+        },
+        {
+          id: 'ppf_h2',
+          q: 'If we ___ more diligent, we would have avoided the critical bug.',
+          options: ['were', 'had been', 'have been', 'would be'],
+          answer: 'had been',
+          explanation: 'The past counterfactual condition (Third Conditional) takes "had been".'
+        },
+        {
+          id: 'ppf_h3',
+          q: 'I wished I ___ the security credentials with the lead tester.',
+          options: ['shared', 'had shared', 'have shared', 'share'],
+          answer: 'had shared',
+          explanation: 'Wishes about past regrets require the Past Perfect tense ("had shared").'
+        }
+      ]
+    }
   },
   {
-    title: "Past & Memories #3",
-    size: 8,
-    clues: [
-      { number: 1, direction: 'across', clue: "Yesterday I _______ a book. (4 letters)", answer: "READ", row: 2, col: 1 },
-      { number: 2, direction: 'across', clue: "Past of 'run'. (3 letters)", answer: "RAN", row: 4, col: 3 },
-      { number: 3, direction: 'across', clue: "Past of 'is/am'. (3 letters)", answer: "WAS", row: 6, col: 2 },
-      { number: 4, direction: 'down', clue: "Irregular past of 'write'. (5 letters)", answer: "WROTE", row: 1, col: 4 },
-      { number: 5, direction: 'down', clue: "Opposite of 'new'. (3 letters)", answer: "OLD", row: 2, col: 2 },
-      { number: 6, direction: 'down', clue: "Opposite of 'wet'. (3 letters)", answer: "DRY", row: 4, col: 5 }
-    ]
+    id: 'future_simple',
+    name: 'Future Simple',
+    category: 'Future',
+    summary: 'Used for instant promises, future predictions, spontaneous decisions, or formal plans.',
+    formula: 'Subject + will + Base Verb',
+    example: 'I will help you study this complicated lesson.',
+    quizzes: {
+      easy: [
+        {
+          id: 'fs_e1',
+          q: 'I think it ___ snow tomorrow in the mountains.',
+          options: ['will', 'shall', 'going to', 'is'],
+          answer: 'will',
+          explanation: 'Predictions about the future based on belief/opinion use "will".'
+        },
+        {
+          id: 'fs_e2',
+          q: 'Don\'t worry! I ___ carry those heavy boxes for you.',
+          options: ['will', 'am', 'shall', 'did'],
+          answer: 'will',
+          explanation: 'Spontaneous offers of help or immediate decisions require "will".'
+        },
+        {
+          id: 'fs_e3',
+          q: 'They ___ arrive at the terminal at around 6 PM.',
+          options: ['will', 'are', 'shall to', 'going'],
+          answer: 'will',
+          explanation: 'Standard future action is expressed with "will" plus the base verb "arrive".'
+        },
+        {
+          id: 'fs_e4',
+          q: '___ you please close the windows?',
+          options: ['Will', 'Shall', 'Are', 'Do'],
+          answer: 'Will',
+          explanation: 'Polite requests or questions inquiring about future willingness start with "Will".'
+        }
+      ],
+      medium: [
+        {
+          id: 'fs_m1',
+          q: 'If it rains this evening, the outdoor match ___ cancelled.',
+          options: ['will', 'will be', 'is', 'has'],
+          answer: 'will be',
+          explanation: 'First Conditional sentences take "will + base verb" (passive form is "will be cancelled").'
+        },
+        {
+          id: 'fs_m2',
+          q: 'The executive committee ___ announce the new strategy next week.',
+          options: ['will', 'is going', 'shall to', 'does'],
+          answer: 'will',
+          explanation: 'Official formal future declarations are traditionally expressed using "will".'
+        },
+        {
+          id: 'fs_m3',
+          q: 'Perhaps we ___ see you at the software conference.',
+          options: ['will', 'going to', 'are', 'do'],
+          answer: 'will',
+          explanation: 'Future possibility with qualifying adverbs like "Perhaps" or "Probably" takes "will".'
+        },
+        {
+          id: 'fs_m4',
+          q: 'I promise I ___ tell anyone your secret account password.',
+          options: ['will', 'will not', 'am not', 'don\'t'],
+          answer: 'will not',
+          explanation: 'Negative future promises are expressed with "will not" (won\'t).'
+        }
+      ],
+      hard: [
+        {
+          id: 'fs_h1',
+          q: 'No sooner ___ the CEO declare the merger than stockholders will react.',
+          options: ['will', 'shall', 'does', 'has'],
+          answer: 'will',
+          explanation: 'For future inverted narrative structures, use the future auxiliary "will".'
+        },
+        {
+          id: 'fs_h2',
+          q: 'By the time you wake up tomorrow, I ___ be flying over the Atlantic.',
+          options: ['will', 'will have', 'shall', 'am'],
+          answer: 'will',
+          explanation: 'In time clauses, the main clause uses "will" (often simple or continuous) to denote a future event.'
+        },
+        {
+          id: 'fs_h3',
+          q: 'We shall see whether the government ___ fulfill its ambitious fiscal promise.',
+          options: ['will', 'shall', 'is to', 'would'],
+          answer: 'will',
+          explanation: 'Standard indirect questions concerning future actions use "will".'
+        }
+      ]
+    }
   },
   {
-    title: "Future & Space #4",
-    size: 8,
-    clues: [
-      { number: 1, direction: 'across', clue: "We _______ travel to Mars. (4 letters)", answer: "WILL", row: 1, col: 2 },
-      { number: 2, direction: 'across', clue: "A planned future travel helper: 'by _______'. (3 letters)", answer: "AIR", row: 3, col: 2 },
-      { number: 3, direction: 'across', clue: "Opposite of 'stop'. (2 letters)", answer: "GO", row: 5, col: 4 },
-      { number: 4, direction: 'down', clue: "To get or receive: '___ a job'. (3 letters)", answer: "GET", row: 3, col: 4 },
-      { number: 5, direction: 'down', clue: "Our star in the future sky. (3 letters)", answer: "SUN", row: 1, col: 5 },
-      { number: 6, direction: 'down', clue: "Opposite of 'high'. (3 letters)", answer: "LOW", row: 1, col: 2 }
-    ]
+    id: 'present_perfect_continuous',
+    name: 'Present Perfect Continuous',
+    category: 'Present',
+    summary: 'Emphasizes the duration or ongoing nature of an action that began in the past and continues to or affects the present.',
+    formula: 'Subject + have/has been + Verb-ing',
+    example: 'I have been studying English grammar since this morning.',
+    quizzes: {
+      easy: [
+        {
+          id: 'ppc_e1',
+          q: 'She has ___ writing her first novel for six months.',
+          options: ['be', 'been', 'being', 'was'],
+          answer: 'been',
+          explanation: 'The Present Perfect Continuous tense is formed using "has/have been" plus the present participle.'
+        },
+        {
+          id: 'ppc_e2',
+          q: 'We have been ___ for the bus for over half an hour.',
+          options: ['wait', 'waited', 'waiting', 'waits'],
+          answer: 'waiting',
+          explanation: 'The main verb takes the present participle form (Verb-ing) after the auxiliary "have been".'
+        }
+      ],
+      medium: [
+        {
+          id: 'ppc_m1',
+          q: 'How long ___ you been learning how to code software?',
+          options: ['have', 'has', 'did', 'do'],
+          answer: 'have',
+          explanation: 'We use the auxiliary "have" with plural and second-person singular "you" in this tense.'
+        },
+        {
+          id: 'ppc_m2',
+          q: 'The tech company ___ experiencing massive layout changes recently.',
+          options: ['has been', 'have been', 'is being', 'was been'],
+          answer: 'has been',
+          explanation: 'Singular third-person subject "The company" takes "has been" for continuous actions starting in the past and continuing now.'
+        }
+      ],
+      hard: [
+        {
+          id: 'ppc_h1',
+          q: 'Lately, the research team ___ tirelessly on the quantum encryption formula.',
+          options: ['has been working', 'have been working', 'is working', 'has worked'],
+          answer: 'has been working',
+          explanation: 'The collective noun phrase "the research team" acts as a singular subject here, requiring "has been working" to emphasize recent ongoing effort.'
+        }
+      ]
+    }
   },
   {
-    title: "Opposites & Syns #5",
-    size: 8,
-    clues: [
-      { number: 1, direction: 'across', clue: "Antonym of 'cold'. (3 letters)", answer: "HOT", row: 2, col: 2 },
-      { number: 2, direction: 'across', clue: "Synonym of 'intelligent'. (5 letters)", answer: "SMART", row: 4, col: 1 },
-      { number: 3, direction: 'across', clue: "Opposite of 'under'. (4 letters)", answer: "OVER", row: 6, col: 3 },
-      { number: 4, direction: 'down', clue: "Antonym of 'sad'. (5 letters)", answer: "HAPPY", row: 1, col: 3 },
-      { number: 5, direction: 'down', clue: "Opposite of 'bottom'. (3 letters)", answer: "TOP", row: 2, col: 4 },
-      { number: 6, direction: 'down', clue: "Opposite of 'out'. (2 letters)", answer: "IN", row: 4, col: 1 }
-    ]
+    id: 'future_continuous',
+    name: 'Future Continuous',
+    category: 'Future',
+    summary: 'Used to describe actions that will be in progress at a specific point or duration in the future.',
+    formula: 'Subject + will be + Verb-ing',
+    example: 'At this time tomorrow, we will be flying to Tokyo.',
+    quizzes: {
+      easy: [
+        {
+          id: 'fco_e1',
+          q: 'They will ___ sleeping soundly when you arrive late tonight.',
+          options: ['be', 'been', 'being', 'have'],
+          answer: 'be',
+          explanation: 'The Future Continuous is formed with "will be" followed by the present participle (-ing).'
+        },
+        {
+          id: 'fco_e2',
+          q: 'This time tomorrow, I will be ___ my final English exam.',
+          options: ['take', 'took', 'taken', 'taking'],
+          answer: 'taking',
+          explanation: 'Requires the -ing participle form "taking" to represent a continuous action in progress in the future.'
+        }
+      ],
+      medium: [
+        {
+          id: 'fco_m1',
+          q: 'I ___ working in the design department during your vacation next month.',
+          options: ['will be', 'will been', 'am being', 'would be'],
+          answer: 'will be',
+          explanation: 'The auxiliary sequence "will be" denotes ongoing activities in future target periods.'
+        },
+        {
+          id: 'fco_m2',
+          q: 'Will you ___ using the main workspace during the morning session?',
+          options: ['be', 'been', 'have', 'is'],
+          answer: 'be',
+          explanation: 'Interrogative layout structure: "Will" + Subject + "be" + Verb-ing.'
+        }
+      ],
+      hard: [
+        {
+          id: 'fco_h1',
+          q: 'By the time the new legislation takes effect, we ___ adapting to the revised tax protocols.',
+          options: ['will be', 'shall be', 'would be', 'will have been'],
+          answer: 'will be',
+          explanation: 'To express an ongoing state or activity at a specific point of reference in the future, Future Continuous "will be" is used.'
+        }
+      ]
+    }
   },
   {
-    title: "Advanced Words #6",
-    size: 8,
-    clues: [
-      { number: 1, direction: 'across', clue: "To study or gain knowledge. (5 letters)", answer: "LEARN", row: 1, col: 1 },
-      { number: 2, direction: 'across', clue: "Scientific workplace: 'Mr. Zaafouri _______'. (4 letters)", answer: "LABS", row: 4, col: 3 },
-      { number: 3, direction: 'across', clue: "Opposite of 'even'. (3 letters)", answer: "ODD", row: 6, col: 2 },
-      { number: 4, direction: 'down', clue: "A difficult test or task. (4 letters)", answer: "EXAM", row: 1, col: 2 },
-      { number: 5, direction: 'down', clue: "To guide or rule. (4 letters)", answer: "LEAD", row: 1, col: 1 },
-      { number: 6, direction: 'down', clue: "Synonym of 'unhappy'. (3 letters)", answer: "SAD", row: 4, col: 6 }
-    ]
+    id: 'future_perfect',
+    name: 'Future Perfect',
+    category: 'Future',
+    summary: 'Describes an action that will be completed or finished prior to a specific event or point in the future.',
+    formula: 'Subject + will have + Past Participle (V3)',
+    example: 'By next year, I will have graduated from the language academy.',
+    quizzes: {
+      easy: [
+        {
+          id: 'fpf_e1',
+          q: 'By 9:00 PM, she will have ___ all her assignments.',
+          options: ['finish', 'finished', 'finishing', 'finishes'],
+          answer: 'finished',
+          explanation: 'The Future Perfect uses the auxiliary layout "will have" plus the past participle (V3) form "finished".'
+        },
+        {
+          id: 'fpf_e2',
+          q: 'They will ___ completed the entire construction work by next Monday.',
+          options: ['have', 'has', 'had', 'been'],
+          answer: 'have',
+          explanation: 'We always use the base form "have" with "will" in Future Perfect structures.'
+        }
+      ],
+      medium: [
+        {
+          id: 'fpf_m1',
+          q: 'By the time they arrive at the cinema, the movie ___ already started.',
+          options: ['will have', 'will has', 'would have', 'has'],
+          answer: 'will have',
+          explanation: 'Use Future Perfect "will have" to state an action completed before a specific future threshold.'
+        },
+        {
+          id: 'fpf_m2',
+          q: 'In two months\' time, I will have ___ here for five full years.',
+          options: ['work', 'worked', 'working', 'been worked'],
+          answer: 'worked',
+          explanation: 'Past participle form of the regular verb "work" is "worked" in Future Perfect.'
+        }
+      ],
+      hard: [
+        {
+          id: 'fpf_h1',
+          q: 'Under no circumstances ___ the board have reached a consensus before tomorrow\'s emergency session.',
+          options: ['will', 'shall', 'would', 'does'],
+          answer: 'will',
+          explanation: 'Inverted Future Perfect structure starts with a negative adverbial phrase + auxiliary "will" + subject + have + past participle.'
+        }
+      ]
+    }
+  },
+  {
+    id: 'past_perfect_continuous',
+    name: 'Past Perfect Continuous',
+    category: 'Past',
+    summary: 'Describes an action that was ongoing in the past up until another past event or moment in time.',
+    formula: 'Subject + had been + Verb-ing',
+    example: 'They had been hiking for three hours before they realized they were lost.',
+    quizzes: {
+      easy: [
+        {
+          id: 'ppc_past_e1',
+          q: 'He was out of breath because he had ___ running.',
+          options: ['be', 'been', 'being', 'was'],
+          answer: 'been',
+          explanation: 'Past Perfect Continuous requires "had been" + present participle (-ing).'
+        },
+        {
+          id: 'ppc_past_e2',
+          q: 'We had been ___ for two hours when the train finally arrived.',
+          options: ['wait', 'waited', 'waiting', 'waits'],
+          answer: 'waiting',
+          explanation: 'The main verb takes the -ing form after "had been" to show ongoing duration in the past.'
+        }
+      ],
+      medium: [
+        {
+          id: 'ppc_past_m1',
+          q: 'How long had she ___ studying before she took the certification exam?',
+          options: ['been', 'being', 'be', 'was'],
+          answer: 'been',
+          explanation: 'The auxiliary "had ... been" is required in question form for Past Perfect Continuous.'
+        },
+        {
+          id: 'ppc_past_m2',
+          q: 'The ground was soaked because it ___ raining all night.',
+          options: ['had been', 'has been', 'was been', 'is being'],
+          answer: 'had been',
+          explanation: '"Had been raining" explains the past condition (the ground was wet).'
+        }
+      ],
+      hard: [
+        {
+          id: 'ppc_past_h1',
+          q: 'Had they not ___ working diligently, the project would have collapsed before release.',
+          options: ['been', 'being', 'be', 'had'],
+          answer: 'been',
+          explanation: 'Inverted negative condition in Past Perfect Continuous requires "Had they not been working".'
+        }
+      ]
+    }
+  },
+  {
+    id: 'future_perfect_continuous',
+    name: 'Future Perfect Continuous',
+    category: 'Future',
+    summary: 'Emphasizes the continuous duration of an action up to a specific point or deadline in the future.',
+    formula: 'Subject + will have been + Verb-ing',
+    example: 'By next November, she will have been teaching at this university for a decade.',
+    quizzes: {
+      easy: [
+        {
+          id: 'fpc_e1',
+          q: 'By next month, I will have ___ living here for two years.',
+          options: ['been', 'being', 'be', 'had'],
+          answer: 'been',
+          explanation: 'Future Perfect Continuous uses "will have been" + Verb-ing.'
+        },
+        {
+          id: 'fpc_e2',
+          q: 'She will have been ___ for six hours by the time her flight lands.',
+          options: ['fly', 'flew', 'flying', 'flown'],
+          answer: 'flying',
+          explanation: 'Takes the present participle -ing form "flying" after "will have been".'
+        }
+      ],
+      medium: [
+        {
+          id: 'fpc_m1',
+          q: 'By 2028, the engineer ___ working on renewable energy solutions for a full decade.',
+          options: ['will have been', 'will has been', 'would had been', 'is having been'],
+          answer: 'will have been',
+          explanation: 'The standard auxiliary string for Future Perfect Continuous is "will have been".'
+        },
+        {
+          id: 'fpc_m2',
+          q: 'How long will you have been ___ at the software firm by the end of this quarter?',
+          options: ['work', 'working', 'worked', 'been working'],
+          answer: 'working',
+          explanation: 'Requires base verb + ing ("working") to complete the Future Perfect Continuous form.'
+        }
+      ],
+      hard: [
+        {
+          id: 'fpc_h1',
+          q: 'By the time the symposium commences, our delegates will have been ___ research findings for over two years.',
+          options: ['compiling', 'compiled', 'compile', 'having compiled'],
+          answer: 'compiling',
+          explanation: 'The duration up to a future point ("By the time...") uses "will have been compiling".'
+        }
+      ]
+    }
   }
 ];
+
+export const getQuickQuiz3Questions = (topic: TenseTopic): Question[] => {
+  return getQuickQuizQuestions(topic, 3);
+};
+
+export const getQuickQuizQuestions = (
+  topic: TenseTopic,
+  count: number = 3,
+  difficultyFilter?: 'easy' | 'medium' | 'hard' | 'all'
+): Question[] => {
+  const easy = topic.quizzes.easy || [];
+  const medium = topic.quizzes.medium || [];
+  const hard = topic.quizzes.hard || [];
+
+  let pool: Question[] = [];
+
+  if (difficultyFilter === 'easy') {
+    pool = [...easy];
+  } else if (difficultyFilter === 'medium') {
+    pool = [...medium];
+  } else if (difficultyFilter === 'hard') {
+    pool = [...hard];
+  } else {
+    // Balanced selection
+    pool = [...easy, ...medium, ...hard];
+  }
+
+  // If pool is empty or too small, combine everything
+  if (pool.length === 0) {
+    pool = [...easy, ...medium, ...hard];
+  }
+
+  // Shuffle pool (Fisher-Yates)
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Deduplicate by question id
+  const uniqueQuestions: Question[] = [];
+  const seenIds = new Set<string>();
+
+  for (const q of shuffled) {
+    if (!seenIds.has(q.id)) {
+      seenIds.add(q.id);
+      uniqueQuestions.push(q);
+      if (uniqueQuestions.length === count) break;
+    }
+  }
+
+  // If still fewer than count, take whatever is available
+  return uniqueQuestions.slice(0, count);
+};
+
