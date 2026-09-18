@@ -96,7 +96,7 @@ export const TensesView: React.FC = () => {
 
   const fetchImprovementTips = async (currentAnswers: Record<number, string>, qList: Question[]) => {
     const mistakes = qList.map((q, idx) => ({
-      question: q.text,
+      question: q.q,
       correctAnswer: q.answer,
       userAnswer: currentAnswers[idx],
       explanation: q.explanation

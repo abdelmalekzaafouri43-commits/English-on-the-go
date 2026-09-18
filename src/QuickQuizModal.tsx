@@ -9,6 +9,7 @@ import {
   toggleQuizSound,
   isQuizSoundEnabled,
 } from './soundFx';
+import { useOffline } from './OfflineContext';
 
 interface QuickQuizModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
   topic,
   onClose,
 }) => {
+  const { isOnline } = useOffline();
   const [questionCount, setQuestionCount] = useState<3 | 5>(3);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -30,6 +32,7 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
   const [score, setScore] = useState<number>(0);
   const [soundActive, setSoundActive] = useState<boolean>(isQuizSoundEnabled());
   const [isAutoAdvancing, setIsAutoAdvancing] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -41,6 +44,43 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
     }
     setIsAutoAdvancing(false);
   }, []);
+
+  const generateAIQuiz = async (count: 3 | 5 = questionCount, currentTopic: TenseTopic | null = topic) => {
+    if (!currentTopic || !isOnline) return;
+    
+    setIsGenerating(true);
+    clearAutoAdvance();
+    
+    try {
+      const res = await fetch('/api/quiz/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topicName: currentTopic.name,
+          topicCategory: currentTopic.category,
+          formula: currentTopic.formula,
+          count: count
+        })
+      });
+      
+      const data = await res.json();
+      if (data.questions && data.questions.length > 0) {
+        setQuestions(data.questions);
+        setCurrentIndex(0);
+        setAnswers({});
+        setShowResults(false);
+        setScore(0);
+      } else {
+        throw new Error("Invalid format");
+      }
+    } catch (e) {
+      console.error(e);
+      // Fallback to local if generation fails
+      loadQuestions(count, currentTopic);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   // Initialize questions
   const loadQuestions = useCallback(
@@ -268,7 +308,19 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
         </div>
 
         {/* Modal Content */}
-        {!showResults ? (
+        {isGenerating ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-12 gap-5 min-h-[300px]">
+            <div className="relative flex items-center justify-center w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-2 border-slate-800"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+              <span className="text-[10px]">✨</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-sm text-indigo-400 font-black tracking-widest animate-pulse">GENERATING AI QUIZ</p>
+              <p className="text-[10px] text-slate-500 font-mono uppercase">Crafting unique questions for {topic.name}...</p>
+            </div>
+          </div>
+        ) : !showResults ? (
           <div
             className="flex-1 flex flex-col p-4 sm:p-6 gap-4 sm:gap-5"
             onClick={isAnswered ? handleImmediateAdvance : undefined}
@@ -305,6 +357,15 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
                 >
                   5 QUESTIONS
                 </button>
+                {isOnline && (
+                  <button
+                    disabled={isAnswered}
+                    onClick={() => generateAIQuiz(questionCount, topic)}
+                    className="px-2.5 py-1 rounded text-[9px] font-mono font-bold transition cursor-pointer flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-950/30"
+                  >
+                    <span>✨</span> AI QUIZ
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
@@ -594,8 +655,17 @@ export const QuickQuizModal: React.FC<QuickQuizModalProps> = ({
                 onClick={() => loadQuestions(questionCount, topic)}
                 className="flex-1 py-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer shadow-md text-center"
               >
-                RETAKE FRESH QUESTIONS [R]
+                RETAKE FRESH [R]
               </button>
+              {isOnline && (
+                <button
+                  id="quick-quiz-ai-btn"
+                  onClick={() => generateAIQuiz(questionCount, topic)}
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-wider rounded-xl transition cursor-pointer shadow-md text-center flex items-center justify-center gap-2"
+                >
+                  <span className="text-[11px]">✨</span> GENERATE AI QUIZ
+                </button>
+              )}
               <button
                 id="quick-quiz-finish-btn"
                 onClick={() => {

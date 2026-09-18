@@ -122,7 +122,46 @@ export const StatsView: React.FC<StatsViewProps> = ({ onNavigate }) => {
   const quizData = getQuizChartData();
 
   return (
-    <div className="flex-1 w-full p-4 md:p-6 pb-20 md:pb-6 overflow-y-auto flex flex-col gap-6">
+    <div className="flex-1 w-full p-4 md:p-6 pb-24 md:pb-8 overflow-y-auto flex flex-col gap-6">
+      {/* Interactive AR Vision Lens Launch Hero */}
+      <div 
+        onClick={() => onNavigate && onNavigate('vision')}
+        className="p-4 sm:p-5 bg-gradient-to-r from-sky-950/80 via-indigo-950/60 to-slate-950/90 border-2 border-sky-500/50 hover:border-sky-400 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-sky-950/30 cursor-pointer group transition-all transform active:scale-[0.99]"
+      >
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 group-hover:scale-110 group-hover:bg-sky-500/30 transition-all shrink-0">
+            <Sparkles className="w-6 h-6 text-sky-400 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono font-black uppercase tracking-widest text-sky-400 bg-sky-950 px-2 py-0.5 rounded border border-sky-600/40">
+                NEW FEATURE
+              </span>
+              <span className="text-[10px] font-bold text-sky-300 uppercase tracking-wider">
+                Augmented Reality
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-black text-white group-hover:text-sky-200 transition-colors mt-0.5">
+              Launch AR Spatial Vision Lens
+            </h3>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Point your camera at real objects for instant floating 3D labels & voice pronunciations
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onNavigate) onNavigate('vision');
+          }}
+          className="w-full sm:w-auto px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+        >
+          <span>OPEN AR CAMERA</span>
+          <span className="font-mono text-sm">→</span>
+        </button>
+      </div>
+
       {/* Top Level Metric Badges with Vibrant Color Schemes */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Streak card - Amber / Gold colorway */}

@@ -3,71 +3,12 @@ import ReactMarkdown from 'react-markdown';
 import { useOffline } from './OfflineContext';
 import { useTheme } from './ThemeContext';
 
-type CoachMode = 'general' | 'grammar_audit' | 'email' | 'social' | 'essay' | 'vocab';
-
 interface Message {
   id: string;
   sender: 'tutor' | 'user';
   text: string;
   date: string;
-  mode?: CoachMode;
 }
-
-const COACH_MODES: { id: CoachMode; label: string; placeholder: string }[] = [
-  {
-    id: 'general',
-    label: 'Conversation',
-    placeholder: 'Ask any English question, grammar rule, or conversation practice...',
-  },
-  {
-    id: 'grammar_audit',
-    label: 'Grammar Clinic',
-    placeholder: 'Paste any text or sentence to audit grammar, spelling, and phrasing...',
-  },
-  {
-    id: 'email',
-    label: 'Email & Writing',
-    placeholder: 'Ask to write, polish, or rewrite an email or message...',
-  },
-  {
-    id: 'social',
-    label: 'Social Media',
-    placeholder: 'Draft an engaging Facebook post, LinkedIn hook, or tweet...',
-  },
-  {
-    id: 'essay',
-    label: 'Blog & Article',
-    placeholder: 'Structure a blog post, essay, or long-form article...',
-  },
-  {
-    id: 'vocab',
-    label: 'Vocab Booster',
-    placeholder: 'Enter any word to discover C1/C2 advanced alternatives & examples...',
-  },
-];
-
-const QUICK_STARTERS: { title: string; mode: CoachMode; prompt: string }[] = [
-  {
-    title: 'Formal Resignation Email',
-    mode: 'email',
-    prompt: 'Draft a polite, professional 2-week resignation email thanking management for opportunities and offering a smooth handover.',
-  },
-  {
-    title: 'High-Converting Facebook Post',
-    mode: 'social',
-    prompt: 'Write an engaging Facebook post about learning a new language. Start with a hook, share a short story, and end with a question for the audience.',
-  },
-  {
-    title: 'Structured Blog Post Outline',
-    mode: 'essay',
-    prompt: 'Write a comprehensive outline for a blog article titled "The Secret to Daily Productivity." Include a catchy introduction, 3 main sections, and a strong conclusion.',
-  },
-  {
-    title: 'Audit Past vs Present Perfect',
-    mode: 'grammar_audit',
-    prompt: 'Explain the difference between "I lived in London for 2 years" and "I have lived in London for 2 years" with clear examples.',
-  },
-];
 
 // Clean Markdown Renderer
 const TutorMarkdown: React.FC<{ content: string }> = ({ content }) => {
@@ -124,25 +65,21 @@ const TutorMarkdown: React.FC<{ content: string }> = ({ content }) => {
 export const TutorView: React.FC = () => {
   const { isOnline } = useOffline();
   const { currentThemeConfig } = useTheme();
-  const [activeMode, setActiveMode] = useState<CoachMode>('general');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome_msg',
       sender: 'tutor',
-      text: `### Welcome to your Personal AI English Coach
+      text: `### Welcome to your AI English Coach
 
-I am ready to help you achieve full English mastery. You can switch modes above or ask anything:
+I am here to help you master English! You can ask me to:
 
-* **Grammar Clinic**: Audit sentences and understand confusing rules.
-* **Email & Writing**: Generate high-impact emails, cover letters, and reports.
-* **Social Media**: Draft engaging Facebook posts, LinkedIn updates, or tweets.
-* **Blog & Article**: Structure long-form essays, blogs, or academic content.
-* **Vocab Booster**: Discover advanced synonyms and natural native idioms.
-* **Conversation**: Practice real dialogues with instant feedback.
+* **Explain grammar rules**
+* **Check your spelling and phrasing**
+* **Suggest better vocabulary**
+* **Practice conversation**
 
-Select a quick starter below or type your question to begin!`,
+How can I help you today?`,
       date: new Date().toISOString(),
-      mode: 'general',
     },
   ]);
   const [input, setInput] = useState<string>('');
@@ -150,8 +87,8 @@ Select a quick starter below or type your question to begin!`,
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([
     'How do I use "whom" vs "who"?',
-    'Audit this sentence for mistakes',
-    'Write a follow-up business email',
+    'Can we practice a job interview?',
+    'What is the difference between past perfect and simple past?',
   ]);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -190,7 +127,6 @@ Select a quick starter below or type your question to begin!`,
           sender: 'tutor',
           text: 'Conversation reset. What would you like to explore next?',
           date: new Date().toISOString(),
-          mode: activeMode,
         },
       ]);
       setSuggestions([
@@ -201,17 +137,14 @@ Select a quick starter below or type your question to begin!`,
     }
   };
 
-  const handleSendMessage = async (textToSend: string, modeOverride?: CoachMode) => {
+  const handleSendMessage = async (textToSend: string) => {
     if (!textToSend.trim() || isLoading) return;
-
-    const targetMode = modeOverride || activeMode;
 
     const userMsg: Message = {
       id: 'msg_' + Date.now(),
       sender: 'user',
       text: textToSend.trim(),
       date: new Date().toISOString(),
-      mode: targetMode,
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -233,7 +166,7 @@ Select a quick starter below or type your question to begin!`,
         body: JSON.stringify({
           message: textToSend.trim(),
           history: historyPayload,
-          mode: targetMode,
+          mode: 'general',
           tone: 'professional',
         }),
       });
@@ -249,7 +182,6 @@ Select a quick starter below or type your question to begin!`,
         sender: 'tutor',
         text: data.response || 'I had trouble processing that request. Please try again.',
         date: new Date().toISOString(),
-        mode: targetMode,
       };
 
       setMessages((prev) => [...prev, tutorMsg]);
@@ -272,7 +204,6 @@ Here is a quick breakdown regarding your query:
 
 *(Note: Operating in local offline mode. Reconnect for full live AI streaming!)*`,
         date: new Date().toISOString(),
-        mode: targetMode,
       };
       setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
@@ -280,34 +211,12 @@ Here is a quick breakdown regarding your query:
     }
   };
 
-  const currentPlaceholder =
-    COACH_MODES.find((m) => m.id === activeMode)?.placeholder || 'Type your message...';
-
   return (
     <div id="ai-tutor-view" className="flex-1 flex flex-col h-full overflow-hidden">
-      {/* Top Header with Coach Mode Pills & Actions */}
-      <div className="px-4 py-2.5 border-b theme-border theme-header flex flex-wrap items-center justify-between gap-2 shrink-0">
-        {/* Mode Selector Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5">
-          {COACH_MODES.map((mode) => {
-            const isActive = activeMode === mode.id;
-            return (
-              <button
-                key={mode.id}
-                id={`tutor-mode-${mode.id}`}
-                onClick={() => setActiveMode(mode.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? `${currentThemeConfig.activeBtnClass} shadow-md`
-                    : 'bg-slate-950/80 hover:bg-slate-900 border theme-border text-slate-400 hover:text-white'
-                }`}
-              >
-                {mode.label}
-              </button>
-            );
-          })}
-        </div>
-
+      {/* Top Header */}
+      <div className="px-4 py-3 border-b theme-border theme-header flex items-center justify-between shrink-0">
+        <h2 className="text-sm font-black tracking-wider text-slate-200">AI ENGLISH COACH</h2>
+        
         {/* Clear Chat Action */}
         <button
           onClick={handleClearChat}
@@ -391,34 +300,6 @@ Here is a quick breakdown regarding your query:
           </div>
         )}
 
-        {/* Quick Starters (shown when only 1 message exists) */}
-        {messages.length === 1 && (
-          <div className="pt-2">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 block mb-2">
-              POPULAR QUICK TOPICS
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {QUICK_STARTERS.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setActiveMode(item.mode);
-                    handleSendMessage(item.prompt, item.mode);
-                  }}
-                  className="p-3 rounded-xl bg-slate-950/80 hover:bg-slate-900 border theme-border theme-animated-border text-left transition cursor-pointer flex flex-col justify-between gap-1 group"
-                >
-                  <span className="text-xs font-bold text-white group-hover:text-sky-300">
-                    {item.title}
-                  </span>
-                  <span className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                    {item.prompt}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div ref={chatEndRef} />
       </div>
 
@@ -463,7 +344,7 @@ Here is a quick breakdown regarding your query:
                   handleSendMessage(input);
                 }
               }}
-              placeholder={currentPlaceholder}
+              placeholder="Ask your AI English Coach anything..."
               className="w-full bg-slate-950/90 border theme-border rounded-xl px-4 py-2.5 text-xs md:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500 resize-none max-h-32 leading-relaxed"
             />
           </div>

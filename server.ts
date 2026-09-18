@@ -211,13 +211,13 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-  // Robust multi-model generator with automatic fallback across models and exponential backoff
+  // Robust multi-model generator with automatic fallback across supported Gemini models and jittered backoff
   async function generateContentWithFallback(ai: GoogleGenAI, requestPayload: any) {
-    // Priority order: 3.7-flash, 3.1-flash-lite, flash-latest
+    // Valid models per Gemini guidelines: gemini-flash-latest, gemini-3.1-flash-lite, gemini-3.7-flash
     const candidateModels = [
-      "gemini-3.7-flash",
-      "gemini-3.1-flash-lite",
       "gemini-flash-latest",
+      "gemini-3.1-flash-lite",
+      "gemini-3.7-flash",
     ];
 
     let lastError: any = null;
@@ -233,9 +233,10 @@ async function startServer() {
         }
       } catch (err: any) {
         lastError = err;
-        console.warn(`[Gemini Engine] Model ${model} unavailable (Code: ${err?.status || err?.code || "503/Error"}). Switching to next candidate...`);
+        const statusCode = err?.status || err?.code || (err?.message?.includes("429") ? "429" : "Error");
+        console.warn(`[Gemini Engine] Model ${model} unavailable (Code: ${statusCode}). Switching to next candidate...`);
         // Brief jitter delay before next model candidate
-        await new Promise((resolve) => setTimeout(resolve, 250));
+        await new Promise((resolve) => setTimeout(resolve, 300));
       }
     }
 
@@ -243,6 +244,75 @@ async function startServer() {
   }
 
   // API Routes
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", service: "ZLabs English Lens Engine" });
+  });
+
+  app.post("/api/quiz/generate", async (req, res) => {
+    try {
+      const { topicName, topicCategory, formula, count = 3 } = req.body;
+
+      if (!topicName) {
+        return res.status(400).json({ error: "Missing topicName" });
+      }
+
+      const prompt = `You are an expert English teacher. Create a ${count}-question multiple choice quiz about the grammar topic: "${topicName}" (Category: ${topicCategory}).
+The grammar formula is: "${formula || 'N/A'}".
+
+The questions must be highly educational, challenging but fair. 
+Return ONLY a valid JSON array of objects, with no markdown formatting or extra text.
+
+Each object must follow this exact structure:
+{
+  "id": "q1",
+  "q": "The question sentence with a blank or the problem statement.",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "answer": "The exact string from options that is correct.",
+  "explanation": "A short 1-sentence explanation of why the answer is correct according to the rule."
+}
+
+Generate exactly ${count} questions. Ensure the "answer" exactly matches one of the "options".`;
+
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return res.status(503).json({ error: "No API key configured." });
+      }
+
+      const ai = new GoogleGenAI({ apiKey, httpOptions: { headers: { "User-Agent": "aistudio-build" } } });
+      const response = await generateContentWithFallback(ai, {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        config: {
+          temperature: 0.7,
+          responseMimeType: "application/json",
+        },
+      });
+
+      const text = response.text || "";
+      let questions = [];
+      try {
+        questions = JSON.parse(text);
+      } catch (e) {
+        // Strip markdown just in case
+        const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
+        questions = JSON.parse(cleaned);
+      }
+
+      // Add a unique timestamp-based ID to ensure they don't collide
+      const timestamp = Date.now();
+      const formattedQuestions = questions.map((q: any, i: number) => ({
+        id: `ai-${timestamp}-${i}`,
+        q: q.q,
+        options: q.options,
+        answer: q.answer,
+        explanation: q.explanation
+      }));
+
+      res.json({ questions: formattedQuestions });
+    } catch (error: any) {
+      console.error("[Quiz API] Generation error:", error);
+      res.status(500).json({ error: "Failed to generate quiz. Try again later." });
+    }
+  });
   app.post("/api/chat", async (req, res) => {
     const { message, history, mode = "general", tone = "professional", action = "chat" } = req.body;
 
@@ -404,32 +474,135 @@ ${modeSpecificGuidance}
                 },
               },
               {
-                text: "Identify the primary object in this image. Output in this exact format: Name | Definition (A short, vivid English sentence explaining or using the word).",
+                text: `You are an Augmented Reality English vocabulary vision engine. Analyze this camera frame and identify the prominent real-world objects visible (up to 3 main objects).
+Return a valid JSON object with the following schema:
+{
+  "primary": {
+    "name": "Single clear English word (e.g. Laptop, Coffee Mug, Notebook, Plant)",
+    "ipa": "IPA phonetic pronunciation (e.g. /ˈlæptɒp/)",
+    "partOfSpeech": "noun/verb/adjective",
+    "definition": "Clear, concise, educational definition for English learners",
+    "example": "A natural, authentic example sentence using the word in daily context",
+    "translationAr": "Arabic translation",
+    "translationFr": "French translation",
+    "level": "A1/A2/B1/B2/C1",
+    "synonyms": ["synonym1", "synonym2"]
+  },
+  "tags": [
+    {
+      "label": "English word",
+      "category": "furniture/electronics/nature/food/tool/clothing/stationery",
+      "box2d": [ymin, xmin, ymax, xmax] // normalized coordinates 0-1000 representing the approximate bounding box location in the image
+    }
+  ]
+}
+Return ONLY pure JSON without markdown code fences if possible, or within standard JSON markdown.`,
               },
             ],
           },
         ],
       });
 
-      res.json({ response: response?.text || "Object | An everyday object captured by your camera lens." });
+      let rawResponse = response?.text || "";
+      let parsedData: any = null;
+
+      try {
+        const cleaned = rawResponse.replace(/```json\s*|```/g, "").trim();
+        parsedData = JSON.parse(cleaned);
+      } catch (pErr) {
+        // Parse legacy or text format if JSON parsing failed
+        const lines = rawResponse.split("\n").filter((l: string) => l.trim());
+        let name = "Everyday Item";
+        let def = "An item detected through the AR Vision Lens.";
+        if (rawResponse.includes("|")) {
+          const parts = rawResponse.split("|");
+          name = parts[0].replace(/[*#_`]/g, "").trim();
+          def = parts.slice(1).join("|").replace(/^[*#_`]+|[*#_`]+$/g, "").trim();
+        } else if (lines.length > 0) {
+          name = lines[0].replace(/[*#_`]/g, "").trim();
+          def = lines.slice(1).join(" ").trim() || def;
+        }
+
+        parsedData = {
+          primary: {
+            name,
+            ipa: "",
+            partOfSpeech: "noun",
+            definition: def,
+            example: `We inspected the ${name.toLowerCase()} using the AR Vision HUD.`,
+            translationAr: "",
+            translationFr: "",
+            level: "B1",
+            synonyms: []
+          },
+          tags: [
+            {
+              label: name,
+              category: "object",
+              box2d: [250, 250, 750, 750]
+            }
+          ]
+        };
+      }
+
+      res.json({
+        response: `${parsedData.primary?.name || "Object"} | ${parsedData.primary?.definition || "Detected object"}`,
+        data: parsedData
+      });
     } catch (error: any) {
       console.warn("[Vision Engine] Fallback triggered due to:", error?.message || error);
       
       let name = "Everyday Item";
-      let definition = "An interesting object analyzed by the ZLabs English Lens scanner.";
+      let ipa = "/ˈevrideɪ ˈaɪtəm/";
+      let definition = "An interesting object analyzed by the ZLabs English AR Lens scanner.";
+      let example = "Look around your room to identify common English objects in AR.";
+      let translationAr = "عنصر يومي";
+      let translationFr = "Objet du quotidien";
+      let tags = [{ label: "Object", category: "tool", box2d: [250, 250, 750, 750] }];
       
       if (hint === "apple") {
-        name = "Apple";
+        name = "Red Apple";
+        ipa = "/æpl/";
         definition = "A crisp, juicy fruit with a sweet taste, which is a wonderful source of dietary fiber and vitamin C.";
+        example = "She sliced a crisp red apple for a wholesome morning snack.";
+        translationAr = "تفاحة حمراء";
+        translationFr = "Pomme rouge";
+        tags = [{ label: "Apple", category: "food", box2d: [200, 250, 780, 750] }];
       } else if (hint === "coffee") {
-        name = "Espresso";
-        definition = "A rich, highly concentrated coffee beverage brewed by forcing hot water under high pressure through finely-ground beans.";
+        name = "Espresso Cup";
+        ipa = "/esˈpresəʊ kʌp/";
+        definition = "A rich, highly concentrated coffee beverage served in a small ceramic cup.";
+        example = "He ordered a steaming double espresso before starting his study session.";
+        translationAr = "فنجان قهوة";
+        translationFr = "Tasse de café";
+        tags = [{ label: "Coffee", category: "food", box2d: [220, 260, 760, 740] }];
       } else if (hint === "book") {
-        name = "Book";
-        definition = "A set of written or printed pages bound together, containing stories, knowledge, and educational wisdom.";
+        name = "Hardcover Book";
+        ipa = "/bʊk/";
+        definition = "A bound set of printed or written pages containing knowledge, stories, and linguistic literature.";
+        example = "She opened the hardcover book to review her English grammar rules.";
+        translationAr = "كتاب";
+        translationFr = "Livre";
+        tags = [{ label: "Book", category: "stationery", box2d: [180, 200, 820, 800] }];
       }
       
-      res.json({ response: `${name} | ${definition}` });
+      res.json({
+        response: `${name} | ${definition}`,
+        data: {
+          primary: {
+            name,
+            ipa,
+            partOfSpeech: "noun",
+            definition,
+            example,
+            translationAr,
+            translationFr,
+            level: "A2",
+            synonyms: ["object", "item"]
+          },
+          tags
+        }
+      });
     }
   });
 

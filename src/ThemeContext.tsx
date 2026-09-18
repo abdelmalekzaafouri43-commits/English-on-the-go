@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type ThemeType = 'sapphire' | 'emerald' | 'violet' | 'ocean' | 'crimson' | 'midnight';
+export type ThemeType = 'sapphire' | 'sapphire-ice' | 'emerald' | 'violet' | 'ocean' | 'crimson' | 'midnight';
 
 export interface ThemeConfig {
   id: ThemeType;
@@ -23,6 +23,16 @@ export const THEMES: ThemeConfig[] = [
     activeBtnClass: 'bg-sky-500 text-slate-950 font-black',
     borderAccent: 'border-sky-500/40',
     pillColor: 'bg-sky-500',
+  },
+  {
+    id: 'sapphire-ice',
+    name: 'Sapphire Ice (White)',
+    badgeLabel: 'ICE WHITE',
+    previewColor: '#ffffff',
+    accentClass: 'text-white',
+    activeBtnClass: 'bg-white text-slate-950 font-black',
+    borderAccent: 'border-white/40',
+    pillColor: 'bg-white',
   },
   {
     id: 'ocean',

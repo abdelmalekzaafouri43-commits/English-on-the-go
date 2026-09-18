@@ -155,6 +155,17 @@ export const resetToDefaultLexis = (): Flashcard[] => {
   return initial;
 };
 
+export const saveFlashcard = (card: Flashcard): Flashcard[] => {
+  return addFlashcard(card);
+};
+
+export const toggleStarFlashcard = (id: string): Flashcard[] => {
+  const cards = getFlashcards();
+  const updated = cards.map(c => c.id === id ? { ...c, starred: !c.starred } : c);
+  saveFlashcards(updated);
+  return updated;
+};
+
 export const getQuizScores = (): QuizScore[] => {
   const data = localStorage.getItem(STORAGE_KEYS.QUIZ_SCORES);
   return data ? JSON.parse(data) : [];

@@ -1,20 +1,130 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="sapphire">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpg" />
     <link rel="apple-touch-icon" href="/logo.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>ZLabs English Lens</title>
+    <title>Sapphire</title>
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0A0A0A" />
     <!-- Google Fonts: Plus Jakarta Sans for UI, Playfair Display for headings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/index.css" />
   </head>
-  <body class="m-0 p-0 overflow-hidden select-none bg-[#0A0A0A]">
-    <div id="root" class="w-screen h-screen overflow-hidden"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="m-0 p-0 overflow-hidden select-none theme-app-bg text-slate-100 font-sans antialiased">
+    <div id="app" class="w-screen h-screen flex flex-col md:flex-row overflow-hidden">
+      <!-- Left Sidebar / Dashboard (Mandatory: Dashboard on Left) -->
+      <aside id="sidebar" class="w-full md:w-64 theme-nav border-b md:border-b-0 md:border-r theme-border flex flex-col shrink-0 z-30 justify-between">
+        <!-- Logo & Brand Header -->
+        <div className="p-4 border-b theme-border flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-black text-slate-950 text-base shadow-lg shadow-sky-500/20 border border-sky-300/30">
+              S
+            </div>
+            <div>
+              <h1 class="text-sm font-black tracking-wider text-white flex items-center gap-1.5 font-display">
+                SAPPHIRE <span class="text-[9px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-400 font-mono border border-sky-500/30">PRO</span>
+              </h1>
+              <p class="text-[10px] text-slate-400 font-mono tracking-wider">ENGLISH MASTERY</p>
+            </div>
+          </div>
+          <!-- Online status badge -->
+          <div id="online-status-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            LIVE
+          </div>
+        </div>
+
+        <!-- Navigation Tabs List -->
+        <nav class="flex-1 p-2 md:p-3 space-y-1 overflow-y-auto scrollbar-none flex md:flex-col flex-row overflow-x-auto">
+          <button data-tab="dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-900/60">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span class="truncate">DASHBOARD</span>
+            <span class="ml-auto text-[10px] font-mono opacity-50 hidden md:inline">[1]</span>
+          </button>
+          <button data-tab="vision" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-900/60">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+            <span class="truncate">VISION LENS</span>
+            <span class="ml-auto text-[10px] font-mono opacity-50 hidden md:inline">[2]</span>
+          </button>
+          <button data-tab="grammar" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-900/60">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span class="truncate">GRAMMAR & TENSES</span>
+            <span class="ml-auto text-[10px] font-mono opacity-50 hidden md:inline">[3]</span>
+          </button>
+          <button data-tab="scenarios" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-900/60">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span class="truncate">SCENARIOS</span>
+            <span class="ml-auto text-[10px] font-mono opacity-50 hidden md:inline">[4]</span>
+          </button>
+          <button data-tab="tutor" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-900/60">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span class="truncate">AI TUTOR</span>
+            <span class="ml-auto text-[10px] font-mono opacity-50 hidden md:inline">[5]</span>
+          </button>
+          <button data-tab="lexicon" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer text-slate-400 hover:text-white hover:bg-slate-900/60">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span class="truncate">LEXICON</span>
+            <span class="ml-auto text-[10px] font-mono opacity-50 hidden md:inline">[6]</span>
+          </button>
+        </nav>
+
+        <!-- Theme Switcher & Bottom Actions -->
+        <div class="p-3 border-t theme-border hidden md:flex flex-col gap-2">
+          <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 uppercase tracking-wider px-1">
+            <span>ACTIVE THEME</span>
+            <span id="current-theme-name" class="text-sky-400 font-bold">SAPPHIRE</span>
+          </div>
+          <div id="theme-buttons" class="grid grid-cols-7 gap-1 bg-slate-950/80 p-1.5 rounded-xl border theme-border">
+            <button data-theme-id="sapphire" title="Sapphire Navy" class="theme-picker-btn w-full h-5 rounded-md bg-[#38bdf8] hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+            <button data-theme-id="sapphire-ice" title="Ice White" class="theme-picker-btn w-full h-5 rounded-md bg-white hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+            <button data-theme-id="ocean" title="Cobalt Blue" class="theme-picker-btn w-full h-5 rounded-md bg-[#3b82f6] hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+            <button data-theme-id="emerald" title="Emerald Forest" class="theme-picker-btn w-full h-5 rounded-md bg-[#10b981] hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+            <button data-theme-id="violet" title="Royal Violet" class="theme-picker-btn w-full h-5 rounded-md bg-[#a855f7] hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+            <button data-theme-id="crimson" title="Sunset Crimson" class="theme-picker-btn w-full h-5 rounded-md bg-[#f43f5e] hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+            <button data-theme-id="midnight" title="Midnight OLED" class="theme-picker-btn w-full h-5 rounded-md bg-slate-800 hover:scale-105 transition border border-white/20 cursor-pointer"></button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Stage -->
+      <div class="flex-1 flex flex-col h-full overflow-hidden bg-slate-950/40 relative">
+        <!-- Top Toolbar -->
+        <header class="px-4 py-3 border-b theme-border theme-header flex items-center justify-between shrink-0 gap-2">
+          <div class="flex items-center gap-3">
+            <h2 id="view-title" class="text-xs md:text-sm font-black tracking-wider uppercase text-slate-100 font-mono flex items-center gap-2">
+              DASHBOARD
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Launch Quick Quiz Button -->
+            <button id="open-quick-quiz-btn" class="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-sky-500/20">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>QUICK QUIZ</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- View Content Container -->
+        <main id="view-content" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 scrollbar-none relative">
+          <!-- Views render here via Vanilla JS -->
+        </main>
+      </div>
+    </div>
+
+    <!-- Quick Quiz Modal Overlay -->
+    <div id="quiz-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+      <div id="quiz-modal-content" class="w-full max-w-xl bg-slate-900 border theme-border rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <!-- Modal content generated by quiz.js -->
+      </div>
+    </div>
+
+    <!-- Main Vanilla JavaScript Entry Script -->
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
+

@@ -1,6 +1,6 @@
 {
-  "name": "ZLabs English Lens",
-  "description": "An interactive, elegant English learning application created by Mr. Zaafouri Abdelmalek at ZLabs featuring customizable vocabulary flashcards, verb tense quizzes, real scenarios, AI tutor, and premium linguistic workbench tools.",
+  "name": "Sapphire",
+  "description": "Sapphire: An intelligent, elegant English learning application featuring vocabulary flashcards, verb tense quizzes, real scenarios, AI tutor, and linguistic workbench tools.",
   "requestFramePermissions": ["camera", "microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
